@@ -1,0 +1,316 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shadow Scale</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=DM+Mono:wght@500&family=Nunito:wght@600;700;800;900&display=swap"><style>:root{
+  --bg:#e3eee7; --surface:#f7fbf8; --ink:#16302a; --muted:#587168; --line:#bcd2c7; --steel:#33524a;
+  --gold:#c58a1a; --gold-hi:#e9b84f; --hot:#e04866; --sky:#2f86d0; --violet:#7b52cf;
+  --good:#23925a; --bad:#cf3e35; --shadow:rgba(22,48,42,.14); --tint:rgba(47,134,208,.10);
+  --f-display:"Bungee","Impact",system-ui,sans-serif;
+  --f-body:"Nunito",ui-rounded,system-ui,sans-serif;
+  --f-math:"DM Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1d19; --surface:#172a24; --ink:#e1eee7; --muted:#8fb0a4; --line:#2a443b; --steel:#a9c6bc;
+  --gold:#e0a637; --gold-hi:#f6cd70; --hot:#ff6681; --sky:#5cb0f2; --violet:#a98af0;
+  --good:#47c483; --bad:#ff6a5e; --shadow:rgba(0,0,0,.35); --tint:rgba(92,176,242,.12); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1d19; --surface:#172a24; --ink:#e1eee7; --muted:#8fb0a4; --line:#2a443b; --steel:#a9c6bc;
+  --gold:#e0a637; --gold-hi:#f6cd70; --hot:#ff6681; --sky:#5cb0f2; --violet:#a98af0;
+  --good:#47c483; --bad:#ff6a5e; --shadow:rgba(0,0,0,.35); --tint:rgba(92,176,242,.12); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;padding:12px 16px 28px}
+[hidden]{display:none!important}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.title{font-family:var(--f-display);font-size:20px;line-height:1;margin-right:auto}
+.title span{color:var(--hot)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--surface);border:1.5px solid var(--line);font-weight:800;font-variant-numeric:tabular-nums;font-size:14px}
+.pill b{font-size:16px}
+.pill.hot{border-color:var(--hot);color:var(--hot)}
+.hearts{color:var(--hot);letter-spacing:2px}
+.iconbtn{width:36px;height:36px;border-radius:12px;background:var(--surface);border:1.5px solid var(--line);display:grid;place-items:center;font-weight:900}
+.stage{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden;position:relative}
+.stage svg{display:block;width:100%;height:auto}
+.lab{font-family:var(--f-math);font-size:17px;font-weight:500;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round}
+.lab.x{fill:var(--hot);font-weight:700}
+.lab.v{font-family:var(--f-display);font-size:15px;fill:var(--muted)}
+.tri{fill:var(--tint);stroke:var(--ink);stroke-width:2.5;stroke-linejoin:round}
+.arc{fill:none;stroke-width:2.2}
+.prompt{font-weight:900;font-size:18px;text-align:center;text-wrap:balance}
+.prompt .m{font-family:var(--f-math);color:var(--hot)}
+.msg{min-height:1.4em;font-weight:800;color:var(--muted);text-align:center;font-size:15px;text-wrap:balance}
+.msg.bad{color:var(--bad)} .msg.good{color:var(--good)}
+.answer{display:flex;gap:8px}
+.num{flex:1;min-width:0;font-family:var(--f-math);font-size:24px;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
+.btn{padding:12px 18px;border-radius:14px;font-weight:900;border:1.5px solid var(--line);background:var(--surface)}
+.btn.primary{background:var(--hot);color:#fff;border-color:var(--hot);box-shadow:0 4px 0 color-mix(in srgb,var(--hot) 60%,#000)}
+.btn.primary:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--hot) 60%,#000)}
+.choices{display:grid;gap:8px}
+.choice{padding:12px 6px;border-radius:14px;border:2px solid var(--line);background:var(--surface);font-weight:900;font-size:15px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .08s}
+.choice:active{transform:scale(.97)}
+.choice kbd{font-family:var(--f-math);font-size:11px;color:var(--muted);font-weight:500}
+.choice[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.choice[aria-pressed="true"] kbd{color:inherit;opacity:.7}
+.choice.right{background:var(--good);border-color:var(--good);color:#fff}
+.choice.wrong{background:var(--bad);border-color:var(--bad);color:#fff}
+.rowlabel{font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 72%,transparent);display:grid;place-items:center;z-index:20;padding:16px;overflow:auto}
+.card{background:var(--surface);border:2px solid var(--ink);border-radius:24px;padding:24px;width:min(400px,100%);text-align:center;display:flex;flex-direction:column;gap:12px;box-shadow:0 18px 40px var(--shadow);animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+.card h2{font-family:var(--f-display);font-size:28px;margin:0;line-height:1.05}
+.card p{margin:0;color:var(--muted);font-weight:700;line-height:1.4}
+.card .big{font-family:var(--f-display);font-size:40px;color:var(--hot)}
+.card .row{display:flex;gap:8px}
+.card .row button{flex:1}
+.card ul{margin:0;padding:0 0 0 18px;text-align:left;color:var(--ink);font-weight:700;line-height:1.5;font-size:15px}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.bump{display:inline-block;animation:bump .35s}
+@keyframes bump{40%{transform:scale(1.35)}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;height:100%}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.c4{grid-template-columns:repeat(4,1fr)}
+@media (max-width:440px){.c4{grid-template-columns:repeat(2,1fr)}}
+.kind{font-family:var(--f-math);font-size:13px;fill:var(--muted)}
+.ghost{fill:var(--gold-hi);fill-opacity:.35;stroke:var(--gold);stroke-width:3;stroke-linejoin:round}
+.tri2{fill:rgba(224,72,102,.08);stroke:var(--ink);stroke-width:2.5;stroke-linejoin:round}
+.ground{fill:var(--line)}
+.ray{stroke:var(--gold);stroke-width:2;stroke-dasharray:6 6}
+.shad{fill:var(--ink);opacity:.22}
+.simtri{fill:none;stroke-width:2.5;stroke-linejoin:round}
+.solution{background:var(--tint);border-radius:14px;padding:10px 14px;font-weight:800;font-size:15px;line-height:1.45}
+.river{fill:var(--sky);opacity:.22}
+.note{font-family:var(--f-body);font-size:13px;font-weight:700;fill:var(--muted)}
+</style></head><body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="title">Shadow<span>/</span>Scale</div>
+    <div class="pill">Measured <b id="score">0</b></div>
+    <div class="pill">★ <b id="stars">0</b></div>
+    <button class="iconbtn" id="sndBtn"></button>
+  </div>
+  <div class="stage" id="stage">
+    <svg viewBox="0 0 600 360" role="img" aria-label="Similar triangles puzzle" style="background:#dff2fb">
+      <text class="kind" x="16" y="24" id="kind"></text>
+      <g id="scene"></g>
+      <polygon class="ghost" id="ghost" points="" opacity="0"/>
+    </svg>
+  </div>
+  <div class="prompt" id="prompt"></div>
+  <div class="answer" id="numRow"><input class="num" id="ans" type="text" inputmode="decimal" autocomplete="off" placeholder="x =" aria-label="Your answer"><button class="btn primary" id="go">Check</button></div>
+  <div class="choices c4" id="simRow" hidden>
+    <button class="choice" data-c="AA">AA<kbd>1 · two angles</kbd></button>
+    <button class="choice" data-c="SSS">SSS<kbd>2 · three side ratios</kbd></button>
+    <button class="choice" data-c="SAS">SAS<kbd>3 · side-angle-side</kbd></button>
+    <button class="choice" data-c="NO">Not similar<kbd>4</kbd></button>
+  </div>
+  <div class="msg" id="msg"></div>
+  <div class="solution" id="sol" hidden></div>
+  <button class="btn primary" id="nextB" hidden>Next mission →</button>
+</div>
+
+<div class="overlay" id="overlay" hidden><div class="card" id="card"></div></div><canvas id="fx"></canvas>
+<script>(()=>{
+const $=s=>document.querySelector(s);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const MINUS='−';
+const sgn=n=>String(n).replace('-',MINUS);
+function loadJ(k,d){try{const t=localStorage.getItem(k);return t?Object.assign(d,JSON.parse(t)):d;}catch(e){return d;}}
+function saveJ(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+/* sound */
+const SND=loadJ('arcade.sound',{on:true});
+let AC=null;
+function tone(f,d=.1,type='triangle',v=.12,delay=0,slide){if(!SND.on)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state!=='running')AC.resume();
+ const t=AC.currentTime+delay,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);
+ g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.03);}catch(e){}}
+const sfx={
+ tap:()=>tone(620,.05,'sine',.06),
+ good:(n=1)=>{const sc=[523,587,659,784,880,1047,1175];const f=sc[Math.min(n-1,6)];tone(f,.14,'triangle',.12);tone(f*1.5,.18,'sine',.06,.06);},
+ bad:()=>{tone(150,.18,'square',.05);tone(110,.22,'square',.05,.09);},
+ win:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.22,'triangle',.12,i*.08)),
+ over:()=>[392,330,262,196].forEach((f,i)=>tone(f,.28,'triangle',.1,i*.12)),
+ whoosh:()=>tone(300,.25,'sine',.06,0,900)};
+function bindSound(){const b=$('#sndBtn');if(!b)return;const p=()=>{b.textContent=SND.on?'♪':'×';b.setAttribute('aria-label',SND.on?'Mute sound':'Turn sound on');};p();
+ b.onclick=()=>{SND.on=!SND.on;saveJ('arcade.sound',SND);p();if(SND.on)sfx.tap();};}
+function shakeEl(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
+function bump(el){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');}
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const mult=st=>Math.min(5,1+Math.floor(st/3));
+const hearts=n=>'♥'.repeat(Math.max(0,n))+'<span style="opacity:.25">'+'♥'.repeat(Math.max(0,3-n))+'</span>';
+
+/* overlay */
+function showCard(html){$('#card').innerHTML=html;$('#overlay').hidden=false;const p=$('#card .primary');if(p)setTimeout(()=>p.focus(),30);}
+function hideCard(){$('#overlay').hidden=true;}
+
+/* confetti */
+let FXP=[],FXrun=false;
+function confetti(el,n=80){if(RM)return;const cv=$('#fx'),cx=cv.getContext('2d'),dpr=devicePixelRatio||1;cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;
+ const cols=['--hot','--gold-hi','--sky','--good','--violet'].map(cssv);const r=(el||document.body).getBoundingClientRect();
+ for(let i=0;i<n;i++)FXP.push({x:(r.left+r.width/2)*dpr,y:(r.top+r.height*.4)*dpr,vx:(Math.random()-.5)*16,vy:-Math.random()*13-4,s:(4+Math.random()*5)*dpr,c:cols[i%5],a:Math.random()*6,va:(Math.random()-.5)*.3,life:1});
+ if(!FXrun){FXrun=true;const step=()=>{cx.clearRect(0,0,cv.width,cv.height);FXP=FXP.filter(p=>p.life>0);
+  FXP.forEach(p=>{p.vy+=.45;p.x+=p.vx*dpr*.6;p.y+=p.vy*dpr*.6;p.a+=p.va;p.life-=.013;cx.save();cx.globalAlpha=Math.max(0,p.life);cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore();});
+  if(FXP.length)requestAnimationFrame(step);else{FXrun=false;cx.clearRect(0,0,cv.width,cv.height);}};requestAnimationFrame(step);}}
+
+/* triangle geometry. Vertex i has angle angs[i]; side i is opposite vertex i. */
+const D2R=Math.PI/180;
+function rawTri(angs,rot=0,mirror=false){const[A,,C]=angs.map(a=>a*D2R),B=angs[1]*D2R;
+ let P=[[0,0],[Math.sin(C),0],[Math.sin(B)*Math.cos(A),Math.sin(B)*Math.sin(A)]].map(([x,y])=>[mirror?-x:x,-y]);
+ const c=Math.cos(rot),s=Math.sin(rot);return P.map(([x,y])=>[x*c-y*s,x*s+y*c]);}
+function bbox(P){const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);return{x0:Math.min(...xs),x1:Math.max(...xs),y0:Math.min(...ys),y1:Math.max(...ys)};}
+function fitScale(P,box,unit=1){const b=bbox(P);return Math.min(box.w/((b.x1-b.x0)*unit),box.h/((b.y1-b.y0)*unit));}
+function place(P,box,scale,unit=1){const b=bbox(P),k=scale*unit,cx=box.x+box.w/2-(b.x0+b.x1)/2*k,cy=box.y+box.h/2-(b.y0+b.y1)/2*k;return P.map(([x,y])=>[cx+x*k,cy+y*k]);}
+function layoutTri(angs,box,rot=0,mirror=false){const P=rawTri(angs,rot,mirror);return place(P,box,fitScale(P,box));}
+function anglesFromSides(a,b,c){const A=Math.acos((b*b+c*c-a*a)/(2*b*c))/D2R,B=Math.acos((a*a+c*c-b*b)/(2*a*c))/D2R;return[A,B,180-A-B];}
+const sub=(p,q)=>[p[0]-q[0],p[1]-q[1]],add=(p,q)=>[p[0]+q[0],p[1]+q[1]],mul=(p,k)=>[p[0]*k,p[1]*k],len=p=>Math.hypot(p[0],p[1]),unitv=p=>mul(p,1/len(p));
+const f1=n=>Math.round(n*10)/10;
+function polyS(P,cls='tri',extra=''){return`<polygon class="${cls}" points="${P.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" ${extra}/>`;}
+function arcS(V,d1,d2,r,color,n=1){let s='';const cr=d1[0]*d2[1]-d1[1]*d2[0],sw=cr>0?1:0;
+ for(let k=0;k<n;k++){const rr=r+k*5,a=add(V,mul(d1,rr)),b=add(V,mul(d2,rr));s+=`<path class="arc" stroke="${color}" d="M${f1(a[0])} ${f1(a[1])} A${rr} ${rr} 0 0 ${sw} ${f1(b[0])} ${f1(b[1])}"/>`;}return s;}
+function vertDirs(P,i){const V=P[i],U=P[(i+1)%3],W=P[(i+2)%3];return[V,unitv(sub(U,V)),unitv(sub(W,V))];}
+function angleArc(P,i,color,n=1,r=20){const[V,d1,d2]=vertDirs(P,i);return arcS(V,d1,d2,r,color,n);}
+function rightMark(P,i,s=14){const[V,d1,d2]=vertDirs(P,i);const a=add(V,mul(d1,s)),b=add(a,mul(d2,s)),c=add(V,mul(d2,s));return`<path class="arc" stroke="var(--ink)" d="M${f1(a[0])} ${f1(a[1])} L${f1(b[0])} ${f1(b[1])} L${f1(c[0])} ${f1(c[1])}"/>`;}
+function angleLabel(P,i,text,cls='lab',inside=false){const[V,d1,d2]=vertDirs(P,i);const bis=unitv(add(d1,d2));
+ const w=text.length,dist=inside?Math.min(64,30+600/Math.max(10,angOf(d1,d2))):18+w*3.2;const p=add(V,mul(bis,inside?dist:-dist));
+ return`<text class="${cls}" x="${f1(p[0])}" y="${f1(p[1]+6)}" text-anchor="middle">${text}</text>`;}
+function angOf(d1,d2){return Math.acos(Math.max(-1,Math.min(1,d1[0]*d2[0]+d1[1]*d2[1])))/D2R;}
+function centroid(P){return[(P[0][0]+P[1][0]+P[2][0])/3,(P[0][1]+P[1][1]+P[2][1])/3];}
+function sideEnds(P,i){return[P[(i+1)%3],P[(i+2)%3]];}
+function ticksS(P,i,n){const[a,b]=sideEnds(P,i),M=mul(add(a,b),.5),t=unitv(sub(b,a)),nn=[-t[1],t[0]];let s='';
+ for(let k=0;k<n;k++){const o=add(M,mul(t,(k-(n-1)/2)*7)),p=add(o,mul(nn,8)),q=add(o,mul(nn,-8));s+=`<line x1="${f1(p[0])}" y1="${f1(p[1])}" x2="${f1(q[0])}" y2="${f1(q[1])}" stroke="var(--hot)" stroke-width="2.5" stroke-linecap="round"/>`;}return s;}
+function sideLabel(P,i,text,cls='lab'){const[a,b]=sideEnds(P,i),M=mul(add(a,b),.5),C=centroid(P),out=unitv(sub(M,C));const p=add(M,mul(out,14+text.length*2.6));
+ return`<text class="${cls}" x="${f1(p[0])}" y="${f1(p[1]+6)}" text-anchor="middle">${text}</text>`;}
+function vertexName(P,i,name){const C=centroid(P),out=unitv(sub(P[i],C)),p=add(P[i],mul(out,16));return`<text class="lab v" x="${f1(p[0])}" y="${f1(p[1]+6)}" text-anchor="middle">${name}</text>`;}
+function fx(p,q){let s=(p===1?'':p===-1?MINUS:p)+'x';if(q>0)s+=' + '+q;else if(q<0)s+=' '+MINUS+' '+(-q);return s;}
+
+/* real-world scene art (fixed colors, like a picture) */
+const SC={
+ sky:(w=600,h=340)=>`<defs><linearGradient id="skyG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7ec8f0"/><stop offset="1" stop-color="#dff2fb"/></linearGradient></defs><rect width="${w}" height="${h}" fill="url(#skyG)"/>`,
+ sun:(x,y,r=20)=>{let s='';for(let i=0;i<8;i++){const a=i*Math.PI/4;s+=`<line x1="${f1(x+Math.cos(a)*(r+5))}" y1="${f1(y+Math.sin(a)*(r+5))}" x2="${f1(x+Math.cos(a)*(r+13))}" y2="${f1(y+Math.sin(a)*(r+13))}" stroke="#ffcf3a" stroke-width="3" stroke-linecap="round"/>`;}return s+`<circle cx="${x}" cy="${y}" r="${r}" fill="#ffd34d"/>`;},
+ cloud:(x,y,k=1)=>`<g fill="#fff" opacity=".92"><ellipse cx="${x}" cy="${y}" rx="${26*k}" ry="${12*k}"/><ellipse cx="${x-16*k}" cy="${y+3*k}" rx="${16*k}" ry="${9*k}"/><ellipse cx="${x+18*k}" cy="${y+3*k}" rx="${18*k}" ry="${9*k}"/><ellipse cx="${x+2*k}" cy="${y-8*k}" rx="${14*k}" ry="${10*k}"/></g>`,
+ grass:(y,w=600,h=340)=>`<rect x="0" y="${y}" width="${w}" height="${h-y}" fill="#5fae4a"/><rect x="0" y="${y}" width="${w}" height="5" fill="#4a9a3d"/>`,
+ concrete:(y,w=600,h=340)=>`<rect x="0" y="${y}" width="${w}" height="${h-y}" fill="#b9bec4"/><rect x="0" y="${y}" width="${w}" height="4" fill="#9ea4ab"/>`,
+ tree:(x,gy,h)=>`<rect x="${f1(x-h*.05)}" y="${f1(gy-h*.5)}" width="${f1(h*.1)}" height="${f1(h*.5)}" fill="#8b5a2b"/><ellipse cx="${x}" cy="${f1(gy-h*.66)}" rx="${f1(h*.24)}" ry="${f1(h*.34)}" fill="#2f8a3e"/><ellipse cx="${f1(x-h*.07)}" cy="${f1(gy-h*.75)}" rx="${f1(h*.1)}" ry="${f1(h*.14)}" fill="#3fa14f"/>`,
+ person:(x,gy,h,shirt='#e04866')=>{const r=h*.11;return`<g stroke-linecap="round"><line x1="${x}" y1="${f1(gy-h*.45)}" x2="${f1(x-h*.1)}" y2="${gy}" stroke="#2d3a4a" stroke-width="${f1(h*.07)}"/><line x1="${x}" y1="${f1(gy-h*.45)}" x2="${f1(x+h*.1)}" y2="${gy}" stroke="#2d3a4a" stroke-width="${f1(h*.07)}"/><line x1="${x}" y1="${f1(gy-h*.78)}" x2="${x}" y2="${f1(gy-h*.42)}" stroke="${shirt}" stroke-width="${f1(h*.16)}"/><line x1="${f1(x-h*.16)}" y1="${f1(gy-h*.6)}" x2="${f1(x+h*.16)}" y2="${f1(gy-h*.68)}" stroke="${shirt}" stroke-width="${f1(h*.06)}"/><circle cx="${x}" cy="${f1(gy-h+r)}" r="${f1(r)}" fill="#f1c27d"/></g>`;},
+ walls:(x0,x1,top,gy,col='#f3e3c3')=>{const w=x1-x0,h=gy-top;let s=`<rect x="${f1(x0)}" y="${f1(top)}" width="${f1(w)}" height="${f1(h)}" fill="${col}" stroke="#8a6d4a" stroke-width="2"/>`;
+  const dw=Math.min(36,w*.16),dh=Math.min(64,h*.62);s+=`<rect x="${f1(x0+w/2-dw/2)}" y="${f1(gy-dh)}" width="${f1(dw)}" height="${f1(dh)}" fill="#8b5a2b"/><circle cx="${f1(x0+w/2+dw*.3)}" cy="${f1(gy-dh*.45)}" r="2.5" fill="#ffd34d"/>`;
+  const ww=Math.min(40,w*.17),wy=top+h*.22;[x0+w*.2-ww/2,x0+w*.8-ww/2].forEach(wx=>{s+=`<rect x="${f1(wx)}" y="${f1(wy)}" width="${f1(ww)}" height="${f1(ww*.8)}" fill="#bfe6fa" stroke="#fff" stroke-width="3"/><line x1="${f1(wx+ww/2)}" y1="${f1(wy)}" x2="${f1(wx+ww/2)}" y2="${f1(wy+ww*.8)}" stroke="#fff" stroke-width="2"/>`;});return s;},
+ water:(y,h,w=600)=>`<rect x="0" y="${y}" width="${w}" height="${h}" fill="#4aa3df" opacity=".75"/>`+Array.from({length:6},(_,i)=>`<path d="M${40+i*95} ${f1(y+h*.4+(i%2)*10)} q10 -5 20 0 t20 0" stroke="#fff" stroke-width="2" fill="none" opacity=".7"/>`).join(''),
+};
+/* overlay triangle drawn on top of a real object */
+function overlayTri(P,fill='rgba(255,255,255,.18)'){return`<polygon points="${P.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" fill="${fill}" stroke="#16302a" stroke-width="3" stroke-linejoin="round"/>`;}
+
+
+bindSound();
+const SAVE=loadJ('shadow.v2',{solved:0,stars:0});
+const G={solved:SAVE.solved,q:null,tries:0,done:false};
+const VC=['var(--hot)','var(--sky)','var(--violet)'];
+
+function genSides(even){for(;;){let s=[ri(3,12),ri(3,12),ri(3,12)];if(even)s=s.map(v=>v%2?v+1:v);const[a,b,c]=s;
+ if(a+b<=c||a+c<=b||b+c<=a)continue;if(a===b&&b===c)continue;const ang=anglesFromSides(a,b,c);if(Math.min(...ang)<28)continue;return s;}}
+const tier=()=>G.solved<4?0:G.solved<10?1:2;
+
+/* lay out two similar triangles at true relative scale */
+function twoTris(angs,k,unit,boxA,boxB,rotB,mirB){const PA=rawTri(angs,(Math.random()-.5)*.5),PB=rawTri(angs,rotB,mirB);
+ const s=Math.min(fitScale(PA,boxA,unit),fitScale(PB,boxB,unit*k));return[place(PA,boxA,s,unit),place(PB,boxB,s,unit*k)];}
+function marks(P,names){let s='';for(let i=0;i<3;i++){s+=angleArc(P,i,VC[i],i+1,15);s+=vertexName(P,i,names[i]);}return s;}
+
+const KINDS={
+ side(){const t=tier();const k=t===0?pick([2,3]):pick([2,3,4,1.5,2.5]);const sides=genSides(k%1!==0);const angs=anglesFromSides(...sides);const unit=sides[0]/Math.sin(angs[0]*D2R);
+  const i=ri(0,2);let j;do{j=ri(0,2);}while(j===i);const onBig=t===0||Math.random()<.6;
+  let[PA,PB]=twoTris(angs,k,unit,{x:60,y:150,w:170,h:120},{x:270,y:50,w:300,h:250},0,false);
+  const gy=300,sh=(P,y)=>{const m=Math.max(...P.map(p=>p[1]));return P.map(q=>[q[0],q[1]+y-m]);};PA=sh(PA,232);PB=sh(PB,gy);
+  const tent=(P,c)=>`<polygon points="${P.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" fill="${c}" stroke="#16302a" stroke-width="2.5" stroke-linejoin="round"/>`+(()=>{const b0=P[0],b1=P[1],ap=P[2],m=[(b0[0]+b1[0])/2,b0[1]],t=add(m,mul(sub(ap,m),.55));return`<path d="M${f1(m[0]-(b1[0]-b0[0])*.12)} ${f1(m[1])} L${f1(t[0])} ${f1(t[1])} L${f1(m[0]+(b1[0]-b0[0])*.12)} ${f1(m[1])}Z" fill="#7a2b1c" opacity=".55"/>`;})();
+  let s=SC.sky(600,360)+SC.sun(560,40)+SC.cloud(150,40)+SC.grass(gy,600,360)+SC.tree(560,gy,120)+`<rect x="40" y="232" width="210" height="10" fill="#8b5a2b"/><rect x="55" y="242" width="10" height="58" fill="#8b5a2b"/><rect x="225" y="242" width="10" height="58" fill="#8b5a2b"/><text class="lab" x="145" y="270" text-anchor="middle" style="font-size:12px">STORE DISPLAY MODEL</text>`;
+  s+=tent(PA,'#f08a3c')+tent(PB,'#f08a3c')+marks(PA,['A','B','C'])+marks(PB,['D','E','F'])+SC.person(PB[1][0]+30,gy,60,'#3a92d8');
+  const big=sides.map(v=>v*k);
+  s+=sideLabel(PA,i,String(sides[i]))+sideLabel(PB,i,String(big[i]));
+  if(onBig){s+=sideLabel(PA,j,String(sides[j]))+sideLabel(PB,j,'x','lab x');}else{s+=sideLabel(PB,j,String(big[j]))+sideLabel(PA,j,'x','lab x');}
+  const ans=onBig?big[j]:sides[j];
+  return{tag:'TENT MODEL · ΔABC ~ ΔDEF',svg:s,from:PA,to:PB,ask:'The camping store\'s display model tent (ΔABC) is a perfect mini copy of the real tent (ΔDEF). Matching arcs mark matching corners. Find side <span class="m">x</span> (in feet).',ans,hint:'Find the scale factor from a pair of matching sides you know both of: big ÷ small. Then use it on the side you need.',
+   why:onBig?`Scale factor = ${big[i]} ÷ ${sides[i]} = ${k}, so x = ${sides[j]} × ${k} = ${ans}.`:`Scale factor = ${big[i]} ÷ ${sides[i]} = ${k}, so x = ${big[j]} ÷ ${k} = ${ans}.`};},
+ shadow(){const h=pick([5,6]);let s0;do{s0=ri(2,8);}while(s0===h);const m=ri(3,6),H=h*m,S=s0*m;const askH=tier()===0||Math.random()<.6;
+  const gy=300,u=Math.min(230/H,400/(s0+S)),x0=110,x1=x0+s0*u+70;const ph=h*u,th=H*u;
+  const pTop=[x0,gy-ph],pTip=[x0+s0*u,gy],tTop=[x1,gy-th],tTip=[x1+S*u,gy];
+  let v=SC.sky(600,360)+SC.cloud(250,50)+SC.grass(gy,600,360)+SC.sun(560,40);
+  v+=`<polygon class="shad" points="${x0},${gy} ${f1(pTip[0])},${gy} ${f1(pTip[0])},${gy+7} ${x0},${gy+7}"/><polygon class="shad" points="${x1},${gy} ${f1(tTip[0])},${gy} ${f1(tTip[0])},${gy+9} ${x1},${gy+9}"/>`;
+  v+=`<line class="ray" x1="${x0}" y1="${f1(pTop[1])}" x2="${f1(pTip[0])}" y2="${gy}"/><line class="ray" x1="${x1}" y1="${f1(tTop[1])}" x2="${f1(tTip[0])}" y2="${gy}"/>`;
+  // person
+  const hr=Math.max(4,ph*.11);v+=`<g stroke="var(--ink)" stroke-width="3" stroke-linecap="round" fill="none"><circle cx="${x0}" cy="${f1(gy-ph+hr)}" r="${f1(hr)}" fill="var(--surface)"/><line x1="${x0}" y1="${f1(gy-ph+2*hr)}" x2="${x0}" y2="${f1(gy-ph*.42)}"/><line x1="${x0}" y1="${f1(gy-ph*.42)}" x2="${f1(x0-ph*.12)}" y2="${gy}"/><line x1="${x0}" y1="${f1(gy-ph*.42)}" x2="${f1(x0+ph*.12)}" y2="${gy}"/><line x1="${f1(x0-ph*.16)}" y1="${f1(gy-ph*.68)}" x2="${f1(x0+ph*.16)}" y2="${f1(gy-ph*.68)}"/></g>`;
+  // tree
+  v+=`<rect x="${f1(x1-th*.04)}" y="${f1(gy-th*.55)}" width="${f1(th*.08)}" height="${f1(th*.55)}" fill="var(--gold)"/><ellipse cx="${x1}" cy="${f1(gy-th*.68)}" rx="${f1(th*.2)}" ry="${f1(th*.32)}" fill="var(--good)" fill-opacity=".85"/>`;
+  const lab=(x,y,t,c='lab')=>`<text class="${c}" x="${f1(x)}" y="${f1(y)}" text-anchor="middle">${t}</text>`;
+  v+=polyS([[x0,gy],pTop,pTip],'simtri',`stroke="var(--sky)"`)+polyS([[x1,gy],tTop,tTip],'simtri',`stroke="var(--hot)"`);
+  const dim=(x,top,t,c)=>`<path d="M${f1(x)} ${f1(top)}V${gy}M${f1(x-5)} ${f1(top)}h10M${f1(x-5)} ${gy}h10" stroke="var(--muted)" stroke-width="1.5"/><text class="${c}" x="${f1(x-8)}" y="${f1((top+gy)/2+6)}" text-anchor="end">${t}</text>`;
+  v+=dim(x0-ph*.2-12,gy-ph,h+' ft','lab')+lab(x0+s0*u/2,gy+30,s0+' ft');
+  v+=askH?dim(x1-th*.2-12,gy-th,'x','lab x')+lab(x1+S*u/2,gy+30,S+' ft'):dim(x1-th*.2-12,gy-th,H+' ft','lab')+lab(x1+S*u/2,gy+30,'x','lab x');
+  return{tag:'SHADOW PROBLEM · SAME SUN ANGLE',hint:'The sun hits both at the same angle, so the triangles are similar: height ÷ shadow is the same for the person and the tree.',svg:v,from:[[x0,gy],pTop,pTip],to:[[x1,gy],tTop,tTip],
+   ask:askH?`A ${h} ft person casts a ${s0} ft shadow. The tree's shadow is ${S} ft. How tall is the tree?`:`A ${h} ft person casts a ${s0} ft shadow. How long is the ${H} ft tree's shadow?`,ans:askH?H:S,
+   why:askH?`Same sun angle ⇒ similar triangles: ${h}/${s0} = x/${S}, so x = ${h} × ${S} ÷ ${s0} = ${H}.`:`Same sun angle ⇒ similar triangles: ${s0}/${h} = x/${H}, so x = ${s0} × ${H} ÷ ${h} = ${S}.`};},
+ sim(){const truth=pick(['AA','SSS','SAS','NO']);const base=truth==='NO'?pick(['AA','SSS','SAS']):truth;const k=pick([2,3,1.5]);
+  const sides=genSides(k===1.5);const rawA=anglesFromSides(...sides);let angs=anglesFromSides(...sides).map(Math.round);angs[2]=180-angs[0]-angs[1];
+  let angsB=angs.slice(),sB=sides.map(v=>v*k),bad='';
+  const v=ri(0,2);// SAS included vertex
+  if(truth==='NO'){if(base==='AA'){const d=pick([-1,1])*ri(7,14);angsB[1]+=d;angsB[2]-=d;bad=`The second angles don't match (${angs[1]}° vs ${angsB[1]}°).`;}
+   else{const w=base==='SAS'?(v+1)%3:ri(0,2);for(let tries=0;tries<20;tries++){const d=pick([-2,-1,1,2]);const c=sB.slice();c[w]+=d;const[a,b,cc]=c;if(a+b>cc&&a+cc>b&&b+cc>a&&c[w]>0){sB=c;break;}}
+    bad=`The side ratios aren't all equal (${sides.map((x,i)=>sB[i]+'/'+x).filter((_,i)=>base==='SSS'||i!==v).join(', ')}).`;
+    angsB=anglesFromSides(...sB);}}
+  else if(base!=='AA')angsB=anglesFromSides(...sB);
+  const unit=1,PA=layoutTri(angs,{x:55,y:85,w:170,h:170},(Math.random()-.5)*.4),PB=layoutTri(angsB,{x:315,y:60,w:230,h:220},Math.random()*Math.PI*2,Math.random()<.5);
+  let s=`<rect width="600" height="360" fill="#efe6da"/><rect x="0" y="300" width="600" height="60" fill="#b07a4a"/><rect x="25" y="55" width="230" height="240" fill="#fff" stroke="#c9bfb2" stroke-width="2"/><text class="lab" x="140" y="290" text-anchor="middle" style="font-size:12px">ORIGINAL PRINT</text><rect x="282" y="30" width="296" height="290" fill="#fff" stroke="#c9bfb2" stroke-width="2"/><line x1="300" y1="320" x2="290" y2="358" stroke="#6b4420" stroke-width="6"/><line x1="560" y1="320" x2="570" y2="358" stroke="#6b4420" stroke-width="6"/><text class="lab" x="430" y="314" text-anchor="middle" style="font-size:12px">ENLARGED POSTER</text>`+polyS(PA,'tri',`style="fill:rgba(224,72,102,.25)"`)+polyS(PB,'tri',`style="fill:rgba(224,72,102,.25)"`);
+  if(base==='AA'){[0,1].forEach(i=>{s+=angleArc(PA,i,VC[i],i+1,15)+angleLabel(PA,i,angs[i]+'°');s+=angleArc(PB,i,VC[i],i+1,15)+angleLabel(PB,i,Math.round(angsB[i])+'°');});}
+  else if(base==='SSS'){[0,1,2].forEach(i=>{s+=sideLabel(PA,i,String(sides[i]))+sideLabel(PB,i,String(sB[i]));});}
+  else{const a1=(v+1)%3,a2=(v+2)%3;s+=sideLabel(PA,a1,String(sides[a1]))+sideLabel(PA,a2,String(sides[a2]))+sideLabel(PB,a1,String(sB[a1]))+sideLabel(PB,a2,String(sB[a2]));
+   s+=angleArc(PA,v,VC[0],1,15)+angleLabel(PA,v,Math.round(rawA[v])+'°')+angleArc(PB,v,VC[0],1,15)+angleLabel(PB,v,Math.round(angsB[v])+'°');}
+  
+  const whyOk={AA:'Two pairs of equal angles: similar by AA.',SSS:`Every side ratio is ${k}: similar by SSS.`,SAS:`Two side ratios are ${k} and the angle between them matches: similar by SAS.`};
+  return{tag:'COPY SHOP · SIMILAR OR NOT?',svg:s,from:truth==='NO'?null:PA,to:PB,choice:true,hint:'AA: two angle pairs equal. SSS: all three side ratios equal. SAS: two side ratios equal AND the angle between them equal. Check the ratios by dividing big ÷ small.',ask:'A customer had their triangle logo resized. Did it keep exactly the same shape (similar)? If so, which rule proves it?',ans:truth,why:truth==='NO'?bad+' Not similar.':whyOk[truth]};}};
+
+KINDS.river=function(){const q=pick([3,4,5,6]),r=ri(3,6),m=pick([2,3]),p=q*m,X=r*m;
+ const u=Math.min(470/(p+q),180/X,95/r);const A=[70,235],T=[70,235-X*u],B=[70+p*u,235],C=[70+(p+q)*u,235],D=[C[0],235+r*u];
+ let s=SC.sky(600,360)+SC.grass(0,600,360).replace('y="0" width="600" height="360"','y="0" width="600" height="360"')+`<rect x="0" y="${f1(T[1]-30)}" width="600" height="${f1(235-T[1]+30)}" fill="#4aa3df"/><text class="note" x="584" y="${f1(T[1]-12)}" text-anchor="end">RIVER</text><rect x="0" y="235" width="600" height="140" fill="var(--line)" opacity=".5"/>`;
+ s+=`<circle cx="${T[0]}" cy="${f1(T[1]-10)}" r="14" fill="var(--good)"/><rect x="${T[0]-3}" y="${f1(T[1]-2)}" width="6" height="8" fill="var(--gold)"/>`;
+ s+=`<line x1="${f1(T[0])}" y1="${f1(T[1])}" x2="${f1(D[0])}" y2="${f1(D[1])}" class="ray"/>`;
+ s+=polyS([A,B,T],'simtri',`stroke="var(--hot)"`)+polyS([C,B,D],'simtri',`stroke="var(--sky)"`);
+ [A,B,C,D].forEach((P,i)=>s+=`<circle cx="${f1(P[0])}" cy="${f1(P[1])}" r="5" fill="var(--ink)"/><text class="lab v" x="${f1(P[0]+(i===3?14:-4))}" y="${f1(P[1]+(i===3?6:22))}">${'ABCD'[i]}</text>`);
+ const L=(x,y,t,c='lab')=>`<text class="${c}" x="${f1(x)}" y="${f1(y)}" text-anchor="middle">${t}</text>`;
+ s+=L((A[0]+B[0])/2,227,p+' m')+L((B[0]+C[0])/2,227,q+' m')+L(D[0]+30,(C[1]+D[1])/2+6,r+' m')+L(A[0]-24,(A[1]+T[1])/2+6,'x','lab x');
+ s+=`<path d="M${A[0]} ${A[1]-12}h12v12" fill="none" stroke="var(--ink)" stroke-width="1.5"/><path d="M${f1(C[0])} ${C[1]+12}h-12v-12" fill="none" stroke="var(--ink)" stroke-width="1.5"/>`;
+ return{tag:'SURVEYING · RIVER WIDTH',svg:s,from:[C,B,D],to:[A,B,T],ask:`You can't cross the river to measure it. Stand at A across from the tree, walk ${p} m to B, then ${q} m more to C. Turn and walk ${r} m to D, where B lines up with the tree. How wide is the river (<span class="m">x</span>)?`,ans:X,
+  hint:'The two right triangles share the angle at B (vertical angles), so they are similar. The long walk AB matches the short walk BC.',why:`Scale factor = ${p} ÷ ${q} = ${m}, so x = ${r} × ${m} = ${X} m.`};};
+function poolFor(){const t=tier();return t===0?['shadow','side','shadow']:t===1?['side','shadow','river','sim']:['side','shadow','river','sim','sim'];}
+function paintHUD(){$('#score').textContent=SAVE.solved;$('#stars').textContent=SAVE.stars;}
+function msg(t,c=''){const m=$('#msg');m.textContent=t;m.className='msg '+c;}
+function show(q){$('#scene').innerHTML=q.svg;$('#kind').textContent=q.tag;$('#prompt').innerHTML=q.ask;$('#ghost').setAttribute('opacity','0');$('#sol').hidden=true;$('#nextB').hidden=true;
+ $('#numRow').hidden=!!q.choice;$('#simRow').hidden=!q.choice;document.querySelectorAll('#simRow .choice').forEach(b=>{b.classList.remove('right','wrong');b.setAttribute('aria-pressed','false');});$('#ans').value='';}
+function next(){const q=KINDS[pick(poolFor())]();G.q=q;G.tries=0;G.done=false;show(q);msg('No rush. Work it out, then answer.');paintHUD();if(!q.choice&&!matchMedia('(pointer:coarse)').matches)$('#ans').focus();}
+function morph(from,to,done){const g=$('#ghost');if(!from||RM){done();return;}sfx.whoosh();const t0=performance.now(),D=1000;
+ const step=now=>{const k=Math.min(1,(now-t0)/D),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+  g.setAttribute('points',from.map((p,i)=>f1(p[0]+(to[i][0]-p[0])*e)+','+f1(p[1]+(to[i][1]-p[1])*e)).join(' '));g.setAttribute('opacity',k<.85?'1':String((1-k)/.15));
+  if(k<1)requestAnimationFrame(step);else done();};requestAnimationFrame(step);}
+function answer(v){if(G.done)return;const q=G.q;let ok;
+ if(q.choice){ok=v===q.ans;document.querySelectorAll('#simRow .choice').forEach(b=>{b.classList.remove('wrong');if(b.dataset.c===v&&!ok)b.classList.add('wrong');});}
+ else{const raw=String(v).trim().replace(MINUS,'-');if(raw===''||isNaN(+raw)){shakeEl($('#numRow'));msg('Type a number first.','bad');return;}ok=Math.abs(+raw-q.ans)<0.01;}
+ if(ok){G.done=true;const st=G.tries===0?3:G.tries===1?2:1;SAVE.solved++;SAVE.stars+=st;saveJ('shadow.v2',SAVE);G.solved=SAVE.solved;sfx.win();paintHUD();
+  if(q.choice)document.querySelectorAll('#simRow .choice').forEach(b=>{if(b.dataset.c===q.ans)b.classList.add('right');});
+  msg(`Measured! ${'★'.repeat(st)}${st===3?' First try!':''}`,'good');$('#sol').hidden=false;$('#sol').innerHTML='✓ '+q.why;$('#numRow').hidden=true;
+  if(SAVE.solved%5===0)confetti($('#stage'),70);morph(q.from,q.to,()=>{$('#nextB').hidden=false;$('#nextB').focus();});}
+ else{G.tries++;sfx.bad();shakeEl($('#stage'));
+  if(G.tries===1)msg('Not quite. Hint: '+q.hint,'bad');
+  else{msg("Here's the method. Use it to answer:",'bad');$('#sol').hidden=false;$('#sol').innerHTML=q.why+(q.choice?`<br>Tap <b>${q.ans==='NO'?'Not similar':q.ans}</b>.`:`<br>Type <b>${q.ans}</b>.`);}}}
+$('#go').onclick=()=>answer($('#ans').value);$('#nextB').onclick=next;
+$('#ans').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();answer($('#ans').value);}});
+document.querySelectorAll('#simRow .choice').forEach(b=>b.onclick=()=>answer(b.dataset.c));
+document.addEventListener('keydown',e=>{if(!$('#overlay').hidden){if(e.key==='Enter'){const p=$('#card .primary');if(p){e.preventDefault();p.click();}}return;}
+ if(e.key==='Enter'&&!$('#nextB').hidden&&document.activeElement!==$('#ans')){e.preventDefault();next();return;}
+ if(G.q&&G.q.choice&&!G.done){const c={'1':'AA','2':'SSS','3':'SAS','4':'NO'}[e.key];if(c)answer(c);}});
+next();
+if(!SAVE.solved){showCard(`<h2>Shadow Scale</h2><p>You're the town surveyor. You can't climb every tree or swim every river, but similar triangles let you measure them from the ground.</p>
+ <ul><li>Similar triangles: same shape, different size</li><li>Every side is multiplied by the same <b>scale factor</b></li><li>Scale factor = big side ÷ matching small side</li><li>No clock. A wrong answer gets a hint, then the full method.</li></ul><div class="row"><button class="btn primary" id="go2">Start surveying</button></div>`);$('#go2').onclick=hideCard;}
+
+})();</script></body></html>

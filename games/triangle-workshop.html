@@ -1,0 +1,332 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Triangle Workshop</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=DM+Mono:wght@500&family=Nunito:wght@600;700;800;900&display=swap"><style>:root{
+  --bg:#e3eee7; --surface:#f7fbf8; --ink:#16302a; --muted:#587168; --line:#bcd2c7; --steel:#33524a;
+  --gold:#c58a1a; --gold-hi:#e9b84f; --hot:#e04866; --sky:#2f86d0; --violet:#7b52cf;
+  --good:#23925a; --bad:#cf3e35; --shadow:rgba(22,48,42,.14); --tint:rgba(47,134,208,.10);
+  --f-display:"Bungee","Impact",system-ui,sans-serif;
+  --f-body:"Nunito",ui-rounded,system-ui,sans-serif;
+  --f-math:"DM Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1d19; --surface:#172a24; --ink:#e1eee7; --muted:#8fb0a4; --line:#2a443b; --steel:#a9c6bc;
+  --gold:#e0a637; --gold-hi:#f6cd70; --hot:#ff6681; --sky:#5cb0f2; --violet:#a98af0;
+  --good:#47c483; --bad:#ff6a5e; --shadow:rgba(0,0,0,.35); --tint:rgba(92,176,242,.12); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1d19; --surface:#172a24; --ink:#e1eee7; --muted:#8fb0a4; --line:#2a443b; --steel:#a9c6bc;
+  --gold:#e0a637; --gold-hi:#f6cd70; --hot:#ff6681; --sky:#5cb0f2; --violet:#a98af0;
+  --good:#47c483; --bad:#ff6a5e; --shadow:rgba(0,0,0,.35); --tint:rgba(92,176,242,.12); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;padding:12px 16px 28px}
+[hidden]{display:none!important}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.title{font-family:var(--f-display);font-size:20px;line-height:1;margin-right:auto}
+.title span{color:var(--hot)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--surface);border:1.5px solid var(--line);font-weight:800;font-variant-numeric:tabular-nums;font-size:14px}
+.pill b{font-size:16px}
+.pill.hot{border-color:var(--hot);color:var(--hot)}
+.hearts{color:var(--hot);letter-spacing:2px}
+.iconbtn{width:36px;height:36px;border-radius:12px;background:var(--surface);border:1.5px solid var(--line);display:grid;place-items:center;font-weight:900}
+.stage{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden;position:relative}
+.stage svg{display:block;width:100%;height:auto}
+.lab{font-family:var(--f-math);font-size:17px;font-weight:500;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round}
+.lab.x{fill:var(--hot);font-weight:700}
+.lab.v{font-family:var(--f-display);font-size:15px;fill:var(--muted)}
+.tri{fill:var(--tint);stroke:var(--ink);stroke-width:2.5;stroke-linejoin:round}
+.arc{fill:none;stroke-width:2.2}
+.prompt{font-weight:900;font-size:18px;text-align:center;text-wrap:balance}
+.prompt .m{font-family:var(--f-math);color:var(--hot)}
+.msg{min-height:1.4em;font-weight:800;color:var(--muted);text-align:center;font-size:15px;text-wrap:balance}
+.msg.bad{color:var(--bad)} .msg.good{color:var(--good)}
+.answer{display:flex;gap:8px}
+.num{flex:1;min-width:0;font-family:var(--f-math);font-size:24px;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
+.btn{padding:12px 18px;border-radius:14px;font-weight:900;border:1.5px solid var(--line);background:var(--surface)}
+.btn.primary{background:var(--hot);color:#fff;border-color:var(--hot);box-shadow:0 4px 0 color-mix(in srgb,var(--hot) 60%,#000)}
+.btn.primary:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--hot) 60%,#000)}
+.choices{display:grid;gap:8px}
+.choice{padding:12px 6px;border-radius:14px;border:2px solid var(--line);background:var(--surface);font-weight:900;font-size:15px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .08s}
+.choice:active{transform:scale(.97)}
+.choice kbd{font-family:var(--f-math);font-size:11px;color:var(--muted);font-weight:500}
+.choice[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.choice[aria-pressed="true"] kbd{color:inherit;opacity:.7}
+.choice.right{background:var(--good);border-color:var(--good);color:#fff}
+.choice.wrong{background:var(--bad);border-color:var(--bad);color:#fff}
+.rowlabel{font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 72%,transparent);display:grid;place-items:center;z-index:20;padding:16px;overflow:auto}
+.card{background:var(--surface);border:2px solid var(--ink);border-radius:24px;padding:24px;width:min(400px,100%);text-align:center;display:flex;flex-direction:column;gap:12px;box-shadow:0 18px 40px var(--shadow);animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+.card h2{font-family:var(--f-display);font-size:28px;margin:0;line-height:1.05}
+.card p{margin:0;color:var(--muted);font-weight:700;line-height:1.4}
+.card .big{font-family:var(--f-display);font-size:40px;color:var(--hot)}
+.card .row{display:flex;gap:8px}
+.card .row button{flex:1}
+.card ul{margin:0;padding:0 0 0 18px;text-align:left;color:var(--ink);font-weight:700;line-height:1.5;font-size:15px}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.bump{display:inline-block;animation:bump .35s}
+@keyframes bump{40%{transform:scale(1.35)}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;height:100%}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.order{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:14px;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
+.order svg{width:76px;height:64px;display:block}
+.order .who{font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.order h2{margin:2px 0 4px;font-size:20px;font-weight:900;line-height:1.1}
+.order p{margin:0;font-weight:700;line-height:1.4;font-size:15px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{font-family:var(--f-math);font-size:13px;padding:3px 10px;border-radius:99px;background:var(--ink);color:var(--bg)}
+.chip.ghost{background:none;color:var(--muted);border:1.5px dashed var(--line);font-family:var(--f-body);font-weight:800;cursor:pointer}
+#board{touch-action:none;cursor:crosshair;user-select:none;-webkit-user-select:none}
+.dot{fill:#9fb7ad}
+.handle{fill:var(--hot);stroke:var(--surface);stroke-width:3;cursor:grab}
+.handle.sel{fill:var(--ink)}
+.slab{font-family:var(--f-math);font-size:15px;fill:#16302a;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
+.alab{font-family:var(--f-math);font-size:14px;fill:#16302a;font-weight:500;paint-order:stroke;stroke:#fff;stroke-width:4px}
+.bar2{display:flex;gap:8px;flex-wrap:wrap}
+.bar2 .btn{flex:1}
+.hintline{font-size:13px;color:var(--muted);font-weight:700;text-align:center}
+.prod svg{width:100%;max-width:260px;height:auto;margin:0 auto;display:block}
+</style></head><body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="title">Triangle<span>/</span>Workshop</div>
+    <div class="pill">Day <b id="day">1</b> · <b id="prog">0/5</b></div>
+    <div class="pill">Coins <b id="coins">0</b></div>
+    <button class="iconbtn" id="sndBtn"></button>
+  </div>
+  <div class="order" id="order"></div>
+  <div class="stage"><svg id="board" viewBox="0 0 600 400" role="img" aria-label="Building board. Drag the three red corners onto dots."></svg></div>
+  <div class="hintline">Drag the red corners onto dots (or tap a corner, then tap a dot). Each dot step is 1 ft.</div>
+  <div class="msg" id="msg"></div>
+  <div class="bar2"><button class="btn" id="resetB">Reset shape</button><button class="btn primary" id="deliver">Deliver to customer</button></div>
+</div>
+
+<div class="overlay" id="overlay" hidden><div class="card" id="card"></div></div><canvas id="fx"></canvas>
+<script>(()=>{
+const $=s=>document.querySelector(s);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const MINUS='−';
+const sgn=n=>String(n).replace('-',MINUS);
+function loadJ(k,d){try{const t=localStorage.getItem(k);return t?Object.assign(d,JSON.parse(t)):d;}catch(e){return d;}}
+function saveJ(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+/* sound */
+const SND=loadJ('arcade.sound',{on:true});
+let AC=null;
+function tone(f,d=.1,type='triangle',v=.12,delay=0,slide){if(!SND.on)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state!=='running')AC.resume();
+ const t=AC.currentTime+delay,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);
+ g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.03);}catch(e){}}
+const sfx={
+ tap:()=>tone(620,.05,'sine',.06),
+ good:(n=1)=>{const sc=[523,587,659,784,880,1047,1175];const f=sc[Math.min(n-1,6)];tone(f,.14,'triangle',.12);tone(f*1.5,.18,'sine',.06,.06);},
+ bad:()=>{tone(150,.18,'square',.05);tone(110,.22,'square',.05,.09);},
+ win:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.22,'triangle',.12,i*.08)),
+ over:()=>[392,330,262,196].forEach((f,i)=>tone(f,.28,'triangle',.1,i*.12)),
+ whoosh:()=>tone(300,.25,'sine',.06,0,900)};
+function bindSound(){const b=$('#sndBtn');if(!b)return;const p=()=>{b.textContent=SND.on?'♪':'×';b.setAttribute('aria-label',SND.on?'Mute sound':'Turn sound on');};p();
+ b.onclick=()=>{SND.on=!SND.on;saveJ('arcade.sound',SND);p();if(SND.on)sfx.tap();};}
+function shakeEl(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
+function bump(el){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');}
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const mult=st=>Math.min(5,1+Math.floor(st/3));
+const hearts=n=>'♥'.repeat(Math.max(0,n))+'<span style="opacity:.25">'+'♥'.repeat(Math.max(0,3-n))+'</span>';
+
+/* overlay */
+function showCard(html){$('#card').innerHTML=html;$('#overlay').hidden=false;const p=$('#card .primary');if(p)setTimeout(()=>p.focus(),30);}
+function hideCard(){$('#overlay').hidden=true;}
+
+/* confetti */
+let FXP=[],FXrun=false;
+function confetti(el,n=80){if(RM)return;const cv=$('#fx'),cx=cv.getContext('2d'),dpr=devicePixelRatio||1;cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;
+ const cols=['--hot','--gold-hi','--sky','--good','--violet'].map(cssv);const r=(el||document.body).getBoundingClientRect();
+ for(let i=0;i<n;i++)FXP.push({x:(r.left+r.width/2)*dpr,y:(r.top+r.height*.4)*dpr,vx:(Math.random()-.5)*16,vy:-Math.random()*13-4,s:(4+Math.random()*5)*dpr,c:cols[i%5],a:Math.random()*6,va:(Math.random()-.5)*.3,life:1});
+ if(!FXrun){FXrun=true;const step=()=>{cx.clearRect(0,0,cv.width,cv.height);FXP=FXP.filter(p=>p.life>0);
+  FXP.forEach(p=>{p.vy+=.45;p.x+=p.vx*dpr*.6;p.y+=p.vy*dpr*.6;p.a+=p.va;p.life-=.013;cx.save();cx.globalAlpha=Math.max(0,p.life);cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore();});
+  if(FXP.length)requestAnimationFrame(step);else{FXrun=false;cx.clearRect(0,0,cv.width,cv.height);}};requestAnimationFrame(step);}}
+
+/* triangle geometry. Vertex i has angle angs[i]; side i is opposite vertex i. */
+const D2R=Math.PI/180;
+function rawTri(angs,rot=0,mirror=false){const[A,,C]=angs.map(a=>a*D2R),B=angs[1]*D2R;
+ let P=[[0,0],[Math.sin(C),0],[Math.sin(B)*Math.cos(A),Math.sin(B)*Math.sin(A)]].map(([x,y])=>[mirror?-x:x,-y]);
+ const c=Math.cos(rot),s=Math.sin(rot);return P.map(([x,y])=>[x*c-y*s,x*s+y*c]);}
+function bbox(P){const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);return{x0:Math.min(...xs),x1:Math.max(...xs),y0:Math.min(...ys),y1:Math.max(...ys)};}
+function fitScale(P,box,unit=1){const b=bbox(P);return Math.min(box.w/((b.x1-b.x0)*unit),box.h/((b.y1-b.y0)*unit));}
+function place(P,box,scale,unit=1){const b=bbox(P),k=scale*unit,cx=box.x+box.w/2-(b.x0+b.x1)/2*k,cy=box.y+box.h/2-(b.y0+b.y1)/2*k;return P.map(([x,y])=>[cx+x*k,cy+y*k]);}
+function layoutTri(angs,box,rot=0,mirror=false){const P=rawTri(angs,rot,mirror);return place(P,box,fitScale(P,box));}
+function anglesFromSides(a,b,c){const A=Math.acos((b*b+c*c-a*a)/(2*b*c))/D2R,B=Math.acos((a*a+c*c-b*b)/(2*a*c))/D2R;return[A,B,180-A-B];}
+const sub=(p,q)=>[p[0]-q[0],p[1]-q[1]],add=(p,q)=>[p[0]+q[0],p[1]+q[1]],mul=(p,k)=>[p[0]*k,p[1]*k],len=p=>Math.hypot(p[0],p[1]),unitv=p=>mul(p,1/len(p));
+const f1=n=>Math.round(n*10)/10;
+function polyS(P,cls='tri',extra=''){return`<polygon class="${cls}" points="${P.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" ${extra}/>`;}
+function arcS(V,d1,d2,r,color,n=1){let s='';const cr=d1[0]*d2[1]-d1[1]*d2[0],sw=cr>0?1:0;
+ for(let k=0;k<n;k++){const rr=r+k*5,a=add(V,mul(d1,rr)),b=add(V,mul(d2,rr));s+=`<path class="arc" stroke="${color}" d="M${f1(a[0])} ${f1(a[1])} A${rr} ${rr} 0 0 ${sw} ${f1(b[0])} ${f1(b[1])}"/>`;}return s;}
+function vertDirs(P,i){const V=P[i],U=P[(i+1)%3],W=P[(i+2)%3];return[V,unitv(sub(U,V)),unitv(sub(W,V))];}
+function angleArc(P,i,color,n=1,r=20){const[V,d1,d2]=vertDirs(P,i);return arcS(V,d1,d2,r,color,n);}
+function rightMark(P,i,s=14){const[V,d1,d2]=vertDirs(P,i);const a=add(V,mul(d1,s)),b=add(a,mul(d2,s)),c=add(V,mul(d2,s));return`<path class="arc" stroke="var(--ink)" d="M${f1(a[0])} ${f1(a[1])} L${f1(b[0])} ${f1(b[1])} L${f1(c[0])} ${f1(c[1])}"/>`;}
+function angleLabel(P,i,text,cls='lab',inside=false){const[V,d1,d2]=vertDirs(P,i);const bis=unitv(add(d1,d2));
+ const w=text.length,dist=inside?Math.min(64,30+600/Math.max(10,angOf(d1,d2))):18+w*3.2;const p=add(V,mul(bis,inside?dist:-dist));
+ return`<text class="${cls}" x="${f1(p[0])}" y="${f1(p[1]+6)}" text-anchor="middle">${text}</text>`;}
+function angOf(d1,d2){return Math.acos(Math.max(-1,Math.min(1,d1[0]*d2[0]+d1[1]*d2[1])))/D2R;}
+function centroid(P){return[(P[0][0]+P[1][0]+P[2][0])/3,(P[0][1]+P[1][1]+P[2][1])/3];}
+function sideEnds(P,i){return[P[(i+1)%3],P[(i+2)%3]];}
+function ticksS(P,i,n){const[a,b]=sideEnds(P,i),M=mul(add(a,b),.5),t=unitv(sub(b,a)),nn=[-t[1],t[0]];let s='';
+ for(let k=0;k<n;k++){const o=add(M,mul(t,(k-(n-1)/2)*7)),p=add(o,mul(nn,8)),q=add(o,mul(nn,-8));s+=`<line x1="${f1(p[0])}" y1="${f1(p[1])}" x2="${f1(q[0])}" y2="${f1(q[1])}" stroke="var(--hot)" stroke-width="2.5" stroke-linecap="round"/>`;}return s;}
+function sideLabel(P,i,text,cls='lab'){const[a,b]=sideEnds(P,i),M=mul(add(a,b),.5),C=centroid(P),out=unitv(sub(M,C));const p=add(M,mul(out,14+text.length*2.6));
+ return`<text class="${cls}" x="${f1(p[0])}" y="${f1(p[1]+6)}" text-anchor="middle">${text}</text>`;}
+function vertexName(P,i,name){const C=centroid(P),out=unitv(sub(P[i],C)),p=add(P[i],mul(out,16));return`<text class="lab v" x="${f1(p[0])}" y="${f1(p[1]+6)}" text-anchor="middle">${name}</text>`;}
+function fx(p,q){let s=(p===1?'':p===-1?MINUS:p)+'x';if(q>0)s+=' + '+q;else if(q<0)s+=' '+MINUS+' '+(-q);return s;}
+
+/* real-world scene art (fixed colors, like a picture) */
+const SC={
+ sky:(w=600,h=340)=>`<defs><linearGradient id="skyG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7ec8f0"/><stop offset="1" stop-color="#dff2fb"/></linearGradient></defs><rect width="${w}" height="${h}" fill="url(#skyG)"/>`,
+ sun:(x,y,r=20)=>{let s='';for(let i=0;i<8;i++){const a=i*Math.PI/4;s+=`<line x1="${f1(x+Math.cos(a)*(r+5))}" y1="${f1(y+Math.sin(a)*(r+5))}" x2="${f1(x+Math.cos(a)*(r+13))}" y2="${f1(y+Math.sin(a)*(r+13))}" stroke="#ffcf3a" stroke-width="3" stroke-linecap="round"/>`;}return s+`<circle cx="${x}" cy="${y}" r="${r}" fill="#ffd34d"/>`;},
+ cloud:(x,y,k=1)=>`<g fill="#fff" opacity=".92"><ellipse cx="${x}" cy="${y}" rx="${26*k}" ry="${12*k}"/><ellipse cx="${x-16*k}" cy="${y+3*k}" rx="${16*k}" ry="${9*k}"/><ellipse cx="${x+18*k}" cy="${y+3*k}" rx="${18*k}" ry="${9*k}"/><ellipse cx="${x+2*k}" cy="${y-8*k}" rx="${14*k}" ry="${10*k}"/></g>`,
+ grass:(y,w=600,h=340)=>`<rect x="0" y="${y}" width="${w}" height="${h-y}" fill="#5fae4a"/><rect x="0" y="${y}" width="${w}" height="5" fill="#4a9a3d"/>`,
+ concrete:(y,w=600,h=340)=>`<rect x="0" y="${y}" width="${w}" height="${h-y}" fill="#b9bec4"/><rect x="0" y="${y}" width="${w}" height="4" fill="#9ea4ab"/>`,
+ tree:(x,gy,h)=>`<rect x="${f1(x-h*.05)}" y="${f1(gy-h*.5)}" width="${f1(h*.1)}" height="${f1(h*.5)}" fill="#8b5a2b"/><ellipse cx="${x}" cy="${f1(gy-h*.66)}" rx="${f1(h*.24)}" ry="${f1(h*.34)}" fill="#2f8a3e"/><ellipse cx="${f1(x-h*.07)}" cy="${f1(gy-h*.75)}" rx="${f1(h*.1)}" ry="${f1(h*.14)}" fill="#3fa14f"/>`,
+ person:(x,gy,h,shirt='#e04866')=>{const r=h*.11;return`<g stroke-linecap="round"><line x1="${x}" y1="${f1(gy-h*.45)}" x2="${f1(x-h*.1)}" y2="${gy}" stroke="#2d3a4a" stroke-width="${f1(h*.07)}"/><line x1="${x}" y1="${f1(gy-h*.45)}" x2="${f1(x+h*.1)}" y2="${gy}" stroke="#2d3a4a" stroke-width="${f1(h*.07)}"/><line x1="${x}" y1="${f1(gy-h*.78)}" x2="${x}" y2="${f1(gy-h*.42)}" stroke="${shirt}" stroke-width="${f1(h*.16)}"/><line x1="${f1(x-h*.16)}" y1="${f1(gy-h*.6)}" x2="${f1(x+h*.16)}" y2="${f1(gy-h*.68)}" stroke="${shirt}" stroke-width="${f1(h*.06)}"/><circle cx="${x}" cy="${f1(gy-h+r)}" r="${f1(r)}" fill="#f1c27d"/></g>`;},
+ walls:(x0,x1,top,gy,col='#f3e3c3')=>{const w=x1-x0,h=gy-top;let s=`<rect x="${f1(x0)}" y="${f1(top)}" width="${f1(w)}" height="${f1(h)}" fill="${col}" stroke="#8a6d4a" stroke-width="2"/>`;
+  const dw=Math.min(36,w*.16),dh=Math.min(64,h*.62);s+=`<rect x="${f1(x0+w/2-dw/2)}" y="${f1(gy-dh)}" width="${f1(dw)}" height="${f1(dh)}" fill="#8b5a2b"/><circle cx="${f1(x0+w/2+dw*.3)}" cy="${f1(gy-dh*.45)}" r="2.5" fill="#ffd34d"/>`;
+  const ww=Math.min(40,w*.17),wy=top+h*.22;[x0+w*.2-ww/2,x0+w*.8-ww/2].forEach(wx=>{s+=`<rect x="${f1(wx)}" y="${f1(wy)}" width="${f1(ww)}" height="${f1(ww*.8)}" fill="#bfe6fa" stroke="#fff" stroke-width="3"/><line x1="${f1(wx+ww/2)}" y1="${f1(wy)}" x2="${f1(wx+ww/2)}" y2="${f1(wy+ww*.8)}" stroke="#fff" stroke-width="2"/>`;});return s;},
+ water:(y,h,w=600)=>`<rect x="0" y="${y}" width="${w}" height="${h}" fill="#4aa3df" opacity=".75"/>`+Array.from({length:6},(_,i)=>`<path d="M${40+i*95} ${f1(y+h*.4+(i%2)*10)} q10 -5 20 0 t20 0" stroke="#fff" stroke-width="2" fill="none" opacity=".7"/>`).join(''),
+};
+/* overlay triangle drawn on top of a real object */
+function overlayTri(P,fill='rgba(255,255,255,.18)'){return`<polygon points="${P.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" fill="${fill}" stroke="#16302a" stroke-width="3" stroke-linejoin="round"/>`;}
+
+
+bindSound();
+const KEY='workshop.v1';const SAVE=loadJ(KEY,{coins:0,day:1,done:0,best:0});
+const A=[36,0],B=[18,-31.1769],O=[18,384];
+const pt=(m,n)=>[O[0]+m*A[0]+n*B[0],O[1]+m*A[1]+n*B[1]];
+const DOTS=[];for(let n=0;n<=11;n++)for(let m=-6;m<=17;m++){const p=pt(m,n);if(p[0]>=14&&p[0]<=586)DOTS.push({m,n,p});}
+let V=[[3,1],[11,1],[6,6]],sel=-1,drag=-1,tries=0;
+const ORDERS=[
+ {item:'roof',name:'House roof truss',who:'Builder Bea',side:'isosceles',ang:'obtuse',why:'Both roof slopes have to match so the house looks even, and this neighborhood likes wide, low roofs.'},
+ {item:'roof',name:'Steep cabin roof',who:'Ranger Ray',side:'isosceles',ang:'acute',why:'Snow must slide off. Both slopes match, and every corner is sharp (under 90°).'},
+ {item:'ramp',name:'Skate ramp',who:'Kai',side:'scalene',ang:'right',why:'The back must stand straight up from the ground. The ramp is long and low, so no two sides match.'},
+ {item:'roof',name:'Camping tent front',who:'Ms. Ortiz',side:'isosceles',ang:'acute',why:'Both tent walls are the same length, and the peak is pointy so rain runs off.'},
+ {item:'sign',name:'Yield sign',who:'City Works',side:'equilateral',ang:'acute',why:'Road crews need all three edges the same length.'},
+ {item:'sail',name:'Racing sail',who:'Captain Lu',side:'scalene',ang:'obtuse',why:'A long, low sail: no two edges match, and one corner opens wide.'},
+ {item:'sail',name:'Cruising sail',who:'Captain Lu',side:'scalene',ang:'acute',why:'No two edges match, and every corner is under 90°.'},
+ {item:'pizza',name:'Pizza slice',who:"Tony's Pizza",side:'isosceles',ang:'acute',why:'Both cuts start at the center of the pizza, so those two edges match. Slices are pointy.'},
+ {item:'kite',name:'Kite wing',who:'Aisha',side:'isosceles',ang:'obtuse',why:'Two matching edges and a wide nose so it catches the wind.'},
+ {item:'bridge',name:'Bridge truss',who:'Engineer Eli',side:'equilateral',ang:'acute',why:'Equal sides share the load evenly across the bridge.'},
+ {item:'square',name:'Drafting triangle',who:'Architect Ana',side:'scalene',ang:'right',spec:30,why:'A 30-60-90 drafting triangle: one square corner and one exactly 30° corner.',minDay:2},
+ {item:'roof',name:'Porch roof',who:'Builder Bea',side:'isosceles',ang:'obtuse',spec:120,why:'The peak of this porch roof must be exactly 120°.',minDay:2},
+ {item:'ramp',name:'Loading ramp',who:'Dock Boss Dee',side:'scalene',ang:'right',spec:60,why:'The steep side meets the ground at exactly 60°, with a square back.',minDay:3},
+];
+let queue=[],cur=null;
+function newDay(){const pool=ORDERS.filter(o=>(o.minDay||1)<=SAVE.day);queue=shuffle(pool.slice()).slice(0,5);SAVE.done=0;saveJ(KEY,SAVE);}
+function nextOrder(){if(!queue.length)newDay();cur=queue.shift();tries=0;renderOrder();msg(cur.item==='roof'?'Build the roof right on top of the walls.':cur.item==='sail'?'Build the sail above the boat.':'');paintHUD();draw();}
+
+/* exact lattice math */
+const dv=(i,j)=>[V[j][0]-V[i][0],V[j][1]-V[i][1]];
+const q2=d=>d[0]*d[0]+d[0]*d[1]+d[1]*d[1];
+const dot2=(u,v)=>2*(u[0]*v[0]+u[1]*v[1])+u[0]*v[1]+u[1]*v[0];
+function measure(){const s=[0,1,2].map(i=>q2(dv((i+1)%3,(i+2)%3)));
+ const d=[0,1,2].map(i=>dot2(dv(i,(i+1)%3),dv(i,(i+2)%3)));
+ const P=V.map(v=>pt(...v));const ang=[0,1,2].map(i=>{const[Vx,u,w]=vertDirs(P,i);return angOf(u,w);});
+ const u=dv(0,1),w=dv(0,2),flat=u[0]*w[1]-u[1]*w[0]===0;
+ const eq=(s[0]===s[1])+(s[1]===s[2])+(s[0]===s[2]);const side=eq===3?'equilateral':eq===1?'isosceles':'scalene';
+ const ang2=d.some(x=>x===0)?'right':d.some(x=>x<0)?'obtuse':'acute';
+ return{s,len:s.map(x=>Math.sqrt(x)),ang,side,ang2,flat,P};}
+
+/* drawing */
+const BACK={roof:`<rect x="160" y="300" width="280" height="100" fill="#f3e3c3" stroke="#8a6d4a" stroke-width="2"/><rect x="280" y="330" width="40" height="70" fill="#8b5a2b"/><rect x="185" y="320" width="40" height="32" fill="#bfe6fa"/><rect x="375" y="320" width="40" height="32" fill="#bfe6fa"/>`,
+ ramp:`<rect x="0" y="384" width="600" height="16" fill="#b9bec4"/>`,sail:`<path d="M90 384h420l-50 16H140z" fill="#c58a1a"/><rect x="0" y="398" width="600" height="2" fill="#4aa3df"/>`,
+ sign:`<rect x="296" y="300" width="8" height="100" fill="#6b7178"/>`,pizza:`<circle cx="300" cy="230" r="190" fill="#e8c27a" opacity=".45"/>`,kite:`<path d="M300 300 Q340 350 290 400" stroke="#587168" stroke-width="2" fill="none" stroke-dasharray="5 5"/>`,
+ bridge:`<rect x="20" y="384" width="560" height="12" fill="#6b4420"/>`,square:`<rect x="20" y="20" width="560" height="370" fill="#dbe8f2" opacity=".6"/>`};
+function draw(){const M=measure(),P=M.P;let s=`<rect width="600" height="400" fill="#eef7fb"/>`+(BACK[cur?cur.item:'roof']||'')+DOTS.map(d=>`<circle class="dot" cx="${f1(d.p[0])}" cy="${f1(d.p[1])}" r="3"/>`).join('');
+ if(!M.flat){s+=polyS(P);
+  [0,1,2].forEach(i=>{if(Math.abs(M.ang[i]-90)<.01)s+=rightMark(P,i,13);else s+=angleArc(P,i,'var(--steel)',1,18);
+   s+=angleLabel(P,i,Math.round(M.ang[i])+'°','alab',true);
+   s+=sideLabel(P,i,M.len[i].toFixed(1)+' ft','slab');});}
+ else s+=`<polyline points="${P.map(p=>f1(p[0])+','+f1(p[1])).join(' ')} ${f1(P[0][0])},${f1(P[0][1])}" fill="none" stroke="var(--bad)" stroke-width="3" stroke-dasharray="6 5"/>`;
+ P.forEach((p,i)=>s+=`<circle class="handle${i===sel?' sel':''}" cx="${f1(p[0])}" cy="${f1(p[1])}" r="12" data-i="${i}"/>`);
+ $('#board').innerHTML=s;}
+const svg=$('#board');
+function toSvg(e){const pnt=svg.createSVGPoint();pnt.x=e.clientX;pnt.y=e.clientY;return pnt.matrixTransform(svg.getScreenCTM().inverse());}
+function nearestDot(p){let best=null,bd=1e9;for(const d of DOTS){const dd=(d.p[0]-p.x)**2+(d.p[1]-p.y)**2;if(dd<bd){bd=dd;best=d;}}return best;}
+function moveTo(i,d){if(V.some((v,j)=>j!==i&&v[0]===d.m&&v[1]===d.n))return;if(V[i][0]===d.m&&V[i][1]===d.n)return;V[i]=[d.m,d.n];tone(700+i*120,.03,'sine',.04);draw();}
+svg.addEventListener('pointerdown',e=>{const p=toSvg(e);const P=V.map(v=>pt(...v));let hit=-1,bd=34*34;P.forEach((q,i)=>{const dd=(q[0]-p.x)**2+(q[1]-p.y)**2;if(dd<bd){bd=dd;hit=i;}});
+ if(hit>=0){drag=hit;sel=hit;svg.setPointerCapture(e.pointerId);draw();}else if(sel>=0){moveTo(sel,nearestDot(p));}});
+svg.addEventListener('pointermove',e=>{if(drag<0)return;moveTo(drag,nearestDot(toSvg(e)));});
+svg.addEventListener('pointerup',()=>{drag=-1;});svg.addEventListener('pointercancel',()=>{drag=-1;});
+
+/* order card */
+const ICON={roof:'<path d="M10 34 38 10l28 24z" fill="var(--hot)"/><rect x="16" y="34" width="44" height="26" fill="var(--line)"/><rect x="33" y="44" width="10" height="16" fill="var(--steel)"/>',
+ ramp:'<path d="M8 56h60V22z" fill="var(--sky)"/><path d="M4 56h68" stroke="var(--ink)" stroke-width="3"/>',
+ shelf:'<path d="M14 6v52h52" stroke="var(--ink)" stroke-width="4" fill="none"/><path d="M14 30v28h28z" fill="var(--gold)"/>',
+ sign:'<path d="M12 10h52L38 52z" fill="#fff" stroke="var(--bad)" stroke-width="5" stroke-linejoin="round"/><rect x="36" y="52" width="4" height="10" fill="var(--steel)"/>',
+ sail:'<path d="M30 6v42h30z" fill="var(--sky)"/><path d="M10 50h56l-8 10H18z" fill="var(--gold)"/><path d="M30 4v46" stroke="var(--ink)" stroke-width="2.5"/>',
+ pizza:'<path d="M38 60 14 10h48z" fill="var(--gold-hi)"/><path d="M14 10h48" stroke="var(--gold)" stroke-width="6" stroke-linecap="round"/><circle cx="38" cy="26" r="5" fill="var(--hot)"/><circle cx="31" cy="38" r="4" fill="var(--hot)"/>',
+ kite:'<path d="M8 30 38 10l30 20z" fill="var(--violet)"/><path d="M38 30v30" stroke="var(--muted)" stroke-width="2" stroke-dasharray="3 3"/>',
+ bridge:'<path d="M6 50h64" stroke="var(--ink)" stroke-width="4"/><path d="M12 50 24 30l12 20 12-20 12 20M24 30h24" stroke="var(--steel)" stroke-width="3" fill="none"/>',
+ square:'<path d="M12 58V10l40 48z" fill="var(--tint)" stroke="var(--ink)" stroke-width="3"/><path d="M20 50V36l12 14z" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/>'};
+function renderOrder(){const o=cur,showTags=SAVE.day===1||o.revealed;
+ $('#order').innerHTML=`<svg viewBox="0 0 76 64" aria-hidden="true">${ICON[o.item]}</svg><div><div class="who">Order from ${o.who}</div><h2>${o.name}</h2><p>${o.why}</p>
+ <div class="chips">${showTags?`<span class="chip">${o.side}</span><span class="chip">${o.ang}</span>`:`<button class="chip ghost" id="reveal">Not sure what to build? Show the spec</button>`}${o.spec?`<span class="chip">needs a ${o.spec}° corner</span>`:''}</div></div>`;
+ const r=$('#reveal');if(r)r.onclick=()=>{o.revealed=true;renderOrder();};}
+function paintHUD(){$('#day').textContent=SAVE.day;$('#prog').textContent=SAVE.done+'/5';$('#coins').textContent=SAVE.coins;}
+function msg(t,c=''){const m=$('#msg');m.textContent=t;m.className='msg '+c;}
+
+/* delivery */
+function list(a){return a.map(x=>x.toFixed(1)).join(', ');}
+function deliver(){const M=measure(),o=cur;
+ if(M.flat){msg("All three corners are in a straight line. That's a flat line, not a triangle!",'bad');sfx.bad();return;}
+ const okS=M.side===o.side,okA=M.ang2===o.ang,okSpec=!o.spec||M.ang.some(a=>Math.abs(a-o.spec)<.5);
+ const sideWhy=M.side==='equilateral'?`all three sides are ${M.len[0].toFixed(1)} ft (equilateral)`:M.side==='isosceles'?`two sides match (${list(M.len)} ft), so it's isosceles`:`no sides match (${list(M.len)} ft), so it's scalene`;
+ const angWhy=M.ang2==='right'?'it has a 90° corner (right)':M.ang2==='obtuse'?`the ${Math.round(Math.max(...M.ang))}° corner is over 90° (obtuse)`:`every corner is under 90° (${M.ang.map(Math.round).join('°, ')}°), so it's acute`;
+ if(okS&&okA&&okSpec){const pay=Math.max(10,30-tries*10);SAVE.coins+=pay;SAVE.done++;SAVE.total=(SAVE.total||0)+1;SAVE.best=Math.max(SAVE.best,SAVE.total);saveJ(KEY,SAVE);sfx.win();confetti($('.stage'));paintHUD();
+  const end=SAVE.done>=5;
+  showCard(`<h2>Delivered!</h2><div class="prod">${product(o.item,M.P,M)}</div><p>${o.who}: "Perfect. ${cap(sideWhy)}, and ${angWhy}."</p><p>+${pay} coins${tries?'':' · first try!'}</p>
+   <div class="row"><button class="btn primary" id="nx">${end?'Close up shop for the day':'Next customer'}</button></div>`);
+  $('#nx').onclick=()=>{hideCard();if(end){SAVE.day++;newDay();showCard(`<h2>Day ${SAVE.day-1} done</h2><p>5 happy customers. You have ${SAVE.coins} coins.</p>${SAVE.day===2?'<p>From now on, orders describe what they need without naming the triangle type. Work it out from the story, or tap "Show the spec".</p>':''}<div class="row"><button class="btn primary" id="nd">Open day ${SAVE.day}</button></div>`);$('#nd').onclick=()=>{hideCard();nextOrder();};}else nextOrder();};}
+ else{tries++;sfx.bad();shakeEl($('.stage'));const parts=[];
+  if(!okS)parts.push(`I needed ${o.side}, but ${sideWhy}.`);else parts.push(`Sides are good: ${sideWhy}.`);
+  if(!okA)parts.push(`I needed ${o.ang}, but ${angWhy}.`);
+  if(!okSpec)parts.push(`It also needs an exactly ${o.spec}° corner.`);
+  msg(`${o.who}: "${parts.join(' ')}" Adjust the corners and deliver again.`,'bad');}}
+const cap=s=>s[0].toUpperCase()+s.slice(1);
+
+/* put the player's triangle into the real product */
+function orient(P,a,b){// side a->b horizontal on the bottom, third vertex above
+ const c=[0,1,2].find(i=>i!==a&&i!==b);const d=sub(P[b],P[a]),L=len(d),cs=d[0]/L,sn=d[1]/L;
+ let Q=P.map(p=>{const r=sub(p,P[a]);return[r[0]*cs+r[1]*sn,-r[0]*sn+r[1]*cs];});if(Q[c][1]>0)Q=Q.map(([x,y])=>[x,-y]);return{Q,a,b,c};}
+function fitInto(Q,box){const bb=bbox(Q),k=Math.min(box.w/(bb.x1-bb.x0),box.h/(bb.y1-bb.y0));return Q.map(([x,y])=>[box.x+(x-bb.x0)*k+(box.w-(bb.x1-bb.x0)*k)/2,box.y+(y-bb.y0)*k+(box.h-(bb.y1-bb.y0)*k)]);}
+function oddVertex(M){const r=M.ang.map(a=>Math.round(a));for(let i=0;i<3;i++){const o=r.filter((_,j)=>j!==i);if(o[0]===o[1])return i;}return M.ang.indexOf(Math.max(...M.ang));}
+function product(item,P,M){const pts=Q=>Q.map(p=>f1(p[0])+','+f1(p[1])).join(' ');let s='';
+ const apex=oddVertex(M),rightV=M.ang.findIndex(a=>Math.abs(a-90)<.01);
+ const baseOpp=i=>orient(P,(i+1)%3,(i+2)%3);
+ if(item==='roof'){const{Q}=baseOpp(apex);const F=fitInto(Q,{x:20,y:10,w:220,h:80});const x0=Math.min(...F.map(p=>p[0])),x1=Math.max(...F.map(p=>p[0]));
+  s+=`<rect x="${f1(x0+12)}" y="90" width="${f1(x1-x0-24)}" height="70" fill="var(--line)"/><rect x="${f1((x0+x1)/2-12)}" y="120" width="24" height="40" fill="var(--steel)"/><polygon points="${pts(F)}" fill="var(--hot)"/>`;}
+ else if(item==='ramp'||item==='square'||item==='shelf'){const r=rightV<0?0:rightV;const o=orient(P,(r+1)%3,r);const{Q}=o;let F=fitInto(Q,{x:30,y:20,w:200,h:130});
+  if(F[o.c][0]<F[o.b][0]-1)F=F.map(([x,y])=>[260-x,y]);
+  s+=item==='shelf'?`<path d="M${f1(Math.max(...F.map(p=>p[0])))} 10V150H20" stroke="var(--ink)" stroke-width="5" fill="none"/><polygon points="${pts(F)}" fill="var(--gold)"/>`:
+   item==='square'?`<polygon points="${pts(F)}" fill="var(--tint)" stroke="var(--ink)" stroke-width="3"/>`:
+   `<path d="M10 150h240" stroke="var(--ink)" stroke-width="4"/><polygon points="${pts(F)}" fill="var(--sky)"/>`;}
+ else if(item==='sign'){const{Q}=orient(P,0,1);let F=fitInto(Q,{x:60,y:10,w:140,h:120});F=F.map(([x,y])=>[x,140-y]);s+=`<rect x="126" y="130" width="8" height="40" fill="var(--steel)"/><polygon points="${pts(F)}" fill="#fff" stroke="var(--bad)" stroke-width="10" stroke-linejoin="round"/><text x="130" y="60" text-anchor="middle" font-family="Bungee,Impact,sans-serif" font-size="16" fill="var(--bad)">YIELD</text>`;}
+ else if(item==='sail'){const L=M.len,lg=L.indexOf(Math.max(...L));const o=orient(P,(lg+1)%3,(lg+2)%3);let Q=o.Q.map(([x,y])=>[-y,-x]);const F=fitInto(Q,{x:70,y:10,w:150,h:130});const mx=Math.min(...F.map(p=>p[0]));
+  s+=`<polygon points="${pts(F)}" fill="var(--sky)"/><path d="M${f1(mx)} 6V150" stroke="var(--ink)" stroke-width="4"/><path d="M30 145h200l-25 25H55z" fill="var(--gold)"/>`;}
+ else if(item==='pizza'){const o=baseOpp(apex);let F=fitInto(o.Q,{x:40,y:10,w:180,h:150});F=F.map(([x,y])=>[x,170-y]);s+=`<polygon points="${pts(F)}" fill="var(--gold-hi)" stroke="var(--gold)" stroke-width="4" stroke-linejoin="round"/>`;
+  const C=centroid(F);s+=`<circle cx="${f1(C[0])}" cy="${f1(C[1])}" r="9" fill="var(--hot)"/><circle cx="${f1(C[0]+18)}" cy="${f1(C[1]-14)}" r="7" fill="var(--hot)"/>`;}
+ else if(item==='kite'){const o=baseOpp(apex);const F=fitInto(o.Q,{x:30,y:20,w:200,h:90});const C=F[o.c];s+=`<polygon points="${pts(F)}" fill="var(--violet)"/><path d="M${f1(C[0])} ${f1(Math.max(...F.map(p=>p[1])))} Q${f1(C[0]+30)} 140 ${f1(C[0]-10)} 170" stroke="var(--muted)" stroke-width="2" fill="none" stroke-dasharray="4 4"/>`;}
+ else{const{Q}=orient(P,0,1);const F=fitInto(Q,{x:60,y:30,w:140,h:110});s+=`<rect x="10" y="140" width="240" height="10" fill="var(--steel)"/><polygon points="${pts(F)}" fill="none" stroke="var(--steel)" stroke-width="6" stroke-linejoin="round"/>`;}
+ return`<svg viewBox="0 0 260 175" aria-label="Your triangle in use">${s}</svg>`;}
+
+$('#deliver').onclick=deliver;
+$('#resetB').onclick=()=>{V=[[3,1],[11,1],[6,6]];sel=-1;draw();msg('');};
+document.addEventListener('keydown',e=>{if(!$('#overlay').hidden&&e.key==='Enter'){const p=$('#card .primary');if(p){e.preventDefault();p.click();}}});
+if(!SAVE.done&&SAVE.day===1&&!SAVE.coins)showCard(`<h2>Triangle Workshop</h2><p>Customers need triangles for real things: roofs, ramps, sails, signs and pizza. Drag the corners to build exactly what each one ordered.</p>
+ <ul><li><b>Equilateral:</b> 3 equal sides · <b>Isosceles:</b> 2 · <b>Scalene:</b> none</li><li><b>Acute:</b> all corners under 90° · <b>Right:</b> one is 90° · <b>Obtuse:</b> one is over 90°</li><li>No clock. Take as long as you like.</li></ul>
+ <div class="row"><button class="btn primary" id="st">Open the shop</button></div>`);
+$('#card')&&$('#st')&&($('#st').onclick=hideCard);
+if(!queue.length){const pool=ORDERS.filter(o=>(o.minDay||1)<=SAVE.day);queue=shuffle(pool.slice()).slice(SAVE.done,5);}
+nextOrder();draw();
+
+})();</script></body></html>

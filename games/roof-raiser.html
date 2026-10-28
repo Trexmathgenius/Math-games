@@ -1,0 +1,311 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Roof Raiser</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=DM+Mono:wght@500&family=Nunito:wght@600;700;800;900&display=swap"><style>:root{
+  --bg:#e3eee7; --surface:#f7fbf8; --ink:#16302a; --muted:#587168; --line:#bcd2c7; --steel:#33524a;
+  --gold:#c58a1a; --gold-hi:#e9b84f; --hot:#e04866; --sky:#2f86d0; --violet:#7b52cf;
+  --good:#23925a; --bad:#cf3e35; --shadow:rgba(22,48,42,.14); --tint:rgba(47,134,208,.10);
+  --f-display:"Bungee","Impact",system-ui,sans-serif;
+  --f-body:"Nunito",ui-rounded,system-ui,sans-serif;
+  --f-math:"DM Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1d19; --surface:#172a24; --ink:#e1eee7; --muted:#8fb0a4; --line:#2a443b; --steel:#a9c6bc;
+  --gold:#e0a637; --gold-hi:#f6cd70; --hot:#ff6681; --sky:#5cb0f2; --violet:#a98af0;
+  --good:#47c483; --bad:#ff6a5e; --shadow:rgba(0,0,0,.35); --tint:rgba(92,176,242,.12); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1d19; --surface:#172a24; --ink:#e1eee7; --muted:#8fb0a4; --line:#2a443b; --steel:#a9c6bc;
+  --gold:#e0a637; --gold-hi:#f6cd70; --hot:#ff6681; --sky:#5cb0f2; --violet:#a98af0;
+  --good:#47c483; --bad:#ff6a5e; --shadow:rgba(0,0,0,.35); --tint:rgba(92,176,242,.12); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;padding:12px 16px 28px}
+[hidden]{display:none!important}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.title{font-family:var(--f-display);font-size:20px;line-height:1;margin-right:auto}
+.title span{color:var(--hot)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--surface);border:1.5px solid var(--line);font-weight:800;font-variant-numeric:tabular-nums;font-size:14px}
+.pill b{font-size:16px}
+.pill.hot{border-color:var(--hot);color:var(--hot)}
+.hearts{color:var(--hot);letter-spacing:2px}
+.iconbtn{width:36px;height:36px;border-radius:12px;background:var(--surface);border:1.5px solid var(--line);display:grid;place-items:center;font-weight:900}
+.stage{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden;position:relative}
+.stage svg{display:block;width:100%;height:auto}
+.lab{font-family:var(--f-math);font-size:17px;font-weight:500;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round}
+.lab.x{fill:var(--hot);font-weight:700}
+.lab.v{font-family:var(--f-display);font-size:15px;fill:var(--muted)}
+.tri{fill:var(--tint);stroke:var(--ink);stroke-width:2.5;stroke-linejoin:round}
+.arc{fill:none;stroke-width:2.2}
+.prompt{font-weight:900;font-size:18px;text-align:center;text-wrap:balance}
+.prompt .m{font-family:var(--f-math);color:var(--hot)}
+.msg{min-height:1.4em;font-weight:800;color:var(--muted);text-align:center;font-size:15px;text-wrap:balance}
+.msg.bad{color:var(--bad)} .msg.good{color:var(--good)}
+.answer{display:flex;gap:8px}
+.num{flex:1;min-width:0;font-family:var(--f-math);font-size:24px;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
+.btn{padding:12px 18px;border-radius:14px;font-weight:900;border:1.5px solid var(--line);background:var(--surface)}
+.btn.primary{background:var(--hot);color:#fff;border-color:var(--hot);box-shadow:0 4px 0 color-mix(in srgb,var(--hot) 60%,#000)}
+.btn.primary:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--hot) 60%,#000)}
+.choices{display:grid;gap:8px}
+.choice{padding:12px 6px;border-radius:14px;border:2px solid var(--line);background:var(--surface);font-weight:900;font-size:15px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .08s}
+.choice:active{transform:scale(.97)}
+.choice kbd{font-family:var(--f-math);font-size:11px;color:var(--muted);font-weight:500}
+.choice[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.choice[aria-pressed="true"] kbd{color:inherit;opacity:.7}
+.choice.right{background:var(--good);border-color:var(--good);color:#fff}
+.choice.wrong{background:var(--bad);border-color:var(--bad);color:#fff}
+.rowlabel{font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 72%,transparent);display:grid;place-items:center;z-index:20;padding:16px;overflow:auto}
+.card{background:var(--surface);border:2px solid var(--ink);border-radius:24px;padding:24px;width:min(400px,100%);text-align:center;display:flex;flex-direction:column;gap:12px;box-shadow:0 18px 40px var(--shadow);animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+.card h2{font-family:var(--f-display);font-size:28px;margin:0;line-height:1.05}
+.card p{margin:0;color:var(--muted);font-weight:700;line-height:1.4}
+.card .big{font-family:var(--f-display);font-size:40px;color:var(--hot)}
+.card .row{display:flex;gap:8px}
+.card .row button{flex:1}
+.card ul{margin:0;padding:0 0 0 18px;text-align:left;color:var(--ink);font-weight:700;line-height:1.5;font-size:15px}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.bump{display:inline-block;animation:bump .35s}
+@keyframes bump{40%{transform:scale(1.35)}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;height:100%}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.job{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:14px 16px}
+.job .who{font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.job h2{margin:2px 0 6px;font-size:20px;font-weight:900;line-height:1.15}
+.job p{margin:0;font-weight:700;line-height:1.45;font-size:15px}
+.job .rule{margin-top:8px;font-size:13px;color:var(--muted)}
+.built .tri{fill:var(--gold-hi);fill-opacity:.55;transition:fill-opacity .4s}
+.ext{stroke:var(--ink);stroke-width:3;stroke-dasharray:7 6}
+.street svg{display:block;width:100%;height:auto}
+.solution{background:var(--tint);border-radius:14px;padding:10px 14px;font-weight:800;font-size:15px;line-height:1.45}
+</style></head><body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="title">Roof<span>/</span>Raiser</div>
+    <div class="pill">Jobs <b id="jobs">0</b></div>
+    <div class="pill">★ <b id="stars">0</b></div>
+    <button class="iconbtn" id="sndBtn"></button>
+  </div>
+  <div class="job" id="job"></div>
+  <div class="stage" id="stage"><svg viewBox="0 0 600 340" id="scene" role="img" aria-label="Job site"></svg></div>
+  <div class="answer" id="ansRow"><input class="num" id="ans" type="text" inputmode="numeric" autocomplete="off" placeholder="your answer" aria-label="Your answer"><button class="btn primary" id="go">Cut &amp; build</button></div>
+  <div class="msg" id="msg"></div>
+  <div class="solution" id="sol" hidden></div>
+  <button class="btn primary" id="nextB" hidden>Next job →</button>
+  <div class="stage street" id="street"><svg viewBox="0 0 600 90" id="streetSvg" role="img" aria-label="Your street"></svg></div>
+</div>
+
+<div class="overlay" id="overlay" hidden><div class="card" id="card"></div></div><canvas id="fx"></canvas>
+<script>(()=>{
+const $=s=>document.querySelector(s);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const MINUS='−';
+const sgn=n=>String(n).replace('-',MINUS);
+function loadJ(k,d){try{const t=localStorage.getItem(k);return t?Object.assign(d,JSON.parse(t)):d;}catch(e){return d;}}
+function saveJ(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+/* sound */
+const SND=loadJ('arcade.sound',{on:true});
+let AC=null;
+function tone(f,d=.1,type='triangle',v=.12,delay=0,slide){if(!SND.on)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state!=='running')AC.resume();
+ const t=AC.currentTime+delay,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);
+ g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.03);}catch(e){}}
+const sfx={
+ tap:()=>tone(620,.05,'sine',.06),
+ good:(n=1)=>{const sc=[523,587,659,784,880,1047,1175];const f=sc[Math.min(n-1,6)];tone(f,.14,'triangle',.12);tone(f*1.5,.18,'sine',.06,.06);},
+ bad:()=>{tone(150,.18,'square',.05);tone(110,.22,'square',.05,.09);},
+ win:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.22,'triangle',.12,i*.08)),
+ over:()=>[392,330,262,196].forEach((f,i)=>tone(f,.28,'triangle',.1,i*.12)),
+ whoosh:()=>tone(300,.25,'sine',.06,0,900)};
+function bindSound(){const b=$('#sndBtn');if(!b)return;const p=()=>{b.textContent=SND.on?'♪':'×';b.setAttribute('aria-label',SND.on?'Mute sound':'Turn sound on');};p();
+ b.onclick=()=>{SND.on=!SND.on;saveJ('arcade.sound',SND);p();if(SND.on)sfx.tap();};}
+function shakeEl(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
+function bump(el){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');}
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const mult=st=>Math.min(5,1+Math.floor(st/3));
+const hearts=n=>'♥'.repeat(Math.max(0,n))+'<span style="opacity:.25">'+'♥'.repeat(Math.max(0,3-n))+'</span>';
+
+/* overlay */
+function showCard(html){$('#card').innerHTML=html;$('#overlay').hidden=false;const p=$('#card .primary');if(p)setTimeout(()=>p.focus(),30);}
+function hideCard(){$('#overlay').hidden=true;}
+
+/* confetti */
+let FXP=[],FXrun=false;
+function confetti(el,n=80){if(RM)return;const cv=$('#fx'),cx=cv.getContext('2d'),dpr=devicePixelRatio||1;cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;
+ const cols=['--hot','--gold-hi','--sky','--good','--violet'].map(cssv);const r=(el||document.body).getBoundingClientRect();
+ for(let i=0;i<n;i++)FXP.push({x:(r.left+r.width/2)*dpr,y:(r.top+r.height*.4)*dpr,vx:(Math.random()-.5)*16,vy:-Math.random()*13-4,s:(4+Math.random()*5)*dpr,c:cols[i%5],a:Math.random()*6,va:(Math.random()-.5)*.3,life:1});
+ if(!FXrun){FXrun=true;const step=()=>{cx.clearRect(0,0,cv.width,cv.height);FXP=FXP.filter(p=>p.life>0);
+  FXP.forEach(p=>{p.vy+=.45;p.x+=p.vx*dpr*.6;p.y+=p.vy*dpr*.6;p.a+=p.va;p.life-=.013;cx.save();cx.globalAlpha=Math.max(0,p.life);cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore();});
+  if(FXP.length)requestAnimationFrame(step);else{FXrun=false;cx.clearRect(0,0,cv.width,cv.height);}};requestAnimationFrame(step);}}
+
+/* triangle geometry. Vertex i has angle angs[i]; side i is opposite vertex i. */
+const D2R=Math.PI/180;
+function rawTri(angs,rot=0,mirror=false){const[A,,C]=angs.map(a=>a*D2R),B=angs[1]*D2R;
+ let P=[[0,0],[Math.sin(C),0],[Math.sin(B)*Math.cos(A),Math.sin(B)*Math.sin(A)]].map(([x,y])=>[mirror?-x:x,-y]);
+ const c=Math.cos(rot),s=Math.sin(rot);return P.map(([x,y])=>[x*c-y*s,x*s+y*c]);}
+function bbox(P){const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);return{x0:Math.min(...xs),x1:Math.max(...xs),y0:Math.min(...ys),y1:Math.max(...ys)};}
+function fitScale(P,box,unit=1){const b=bbox(P);return Math.min(box.w/((b.x1-b.x0)*unit),box.h/((b.y1-b.y0)*unit));}
+function place(P,box,scale,unit=1){const b=bbox(P),k=scale*unit,cx=box.x+box.w/2-(b.x0+b.x1)/2*k,cy=box.y+box.h/2-(b.y0+b.y1)/2*k;return P.map(([x,y])=>[cx+x*k,cy+y*k]);}
+function layoutTri(angs,box,rot=0,mirror=false){const P=rawTri(angs,rot,mirror);return place(P,box,fitScale(P,box));}
+function anglesFromSides(a,b,c){const A=Math.acos((b*b+c*c-a*a)/(2*b*c))/D2R,B=Math.acos((a*a+c*c-b*b)/(2*a*c))/D2R;return[A,B,180-A-B];}
+const sub=(p,q)=>[p[0]-q[0],p[1]-q[1]],add=(p,q)=>[p[0]+q[0],p[1]+q[1]],mul=(p,k)=>[p[0]*k,p[1]*k],len=p=>Math.hypot(p[0],p[1]),unitv=p=>mul(p,1/len(p));
+const f1=n=>Math.round(n*10)/10;
+function polyS(P,cls='tri',extra=''){return`<polygon class="${cls}" points="${P.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" ${extra}/>`;}
+function arcS(V,d1,d2,r,color,n=1){let s='';const cr=d1[0]*d2[1]-d1[1]*d2[0],sw=cr>0?1:0;
+ for(let k=0;k<n;k++){const rr=r+k*5,a=add(V,mul(d1,rr)),b=add(V,mul(d2,rr));s+=`<path class="arc" stroke="${color}" d="M${f1(a[0])} ${f1(a[1])} A${rr} ${rr} 0 0 ${sw} ${f1(b[0])} ${f1(b[1])}"/>`;}return s;}
+function vertDirs(P,i){const V=P[i],U=P[(i+1)%3],W=P[(i+2)%3];return[V,unitv(sub(U,V)),unitv(sub(W,V))];}
+function angleArc(P,i,color,n=1,r=20){const[V,d1,d2]=vertDirs(P,i);return arcS(V,d1,d2,r,color,n);}
+function rightMark(P,i,s=14){const[V,d1,d2]=vertDirs(P,i);const a=add(V,mul(d1,s)),b=add(a,mul(d2,s)),c=add(V,mul(d2,s));return`<path class="arc" stroke="var(--ink)" d="M${f1(a[0])} ${f1(a[1])} L${f1(b[0])} ${f1(b[1])} L${f1(c[0])} ${f1(c[1])}"/>`;}
+function angleLabel(P,i,text,cls='lab',inside=false){const[V,d1,d2]=vertDirs(P,i);const bis=unitv(add(d1,d2));
+ const w=text.length,dist=inside?Math.min(64,30+600/Math.max(10,angOf(d1,d2))):18+w*3.2;const p=add(V,mul(bis,inside?dist:-dist));
+ return`<text class="${cls}" x="${f1(p[0])}" y="${f1(p[1]+6)}" text-anchor="middle">${text}</text>`;}
+function angOf(d1,d2){return Math.acos(Math.max(-1,Math.min(1,d1[0]*d2[0]+d1[1]*d2[1])))/D2R;}
+function centroid(P){return[(P[0][0]+P[1][0]+P[2][0])/3,(P[0][1]+P[1][1]+P[2][1])/3];}
+function sideEnds(P,i){return[P[(i+1)%3],P[(i+2)%3]];}
+function ticksS(P,i,n){const[a,b]=sideEnds(P,i),M=mul(add(a,b),.5),t=unitv(sub(b,a)),nn=[-t[1],t[0]];let s='';
+ for(let k=0;k<n;k++){const o=add(M,mul(t,(k-(n-1)/2)*7)),p=add(o,mul(nn,8)),q=add(o,mul(nn,-8));s+=`<line x1="${f1(p[0])}" y1="${f1(p[1])}" x2="${f1(q[0])}" y2="${f1(q[1])}" stroke="var(--hot)" stroke-width="2.5" stroke-linecap="round"/>`;}return s;}
+function sideLabel(P,i,text,cls='lab'){const[a,b]=sideEnds(P,i),M=mul(add(a,b),.5),C=centroid(P),out=unitv(sub(M,C));const p=add(M,mul(out,14+text.length*2.6));
+ return`<text class="${cls}" x="${f1(p[0])}" y="${f1(p[1]+6)}" text-anchor="middle">${text}</text>`;}
+function vertexName(P,i,name){const C=centroid(P),out=unitv(sub(P[i],C)),p=add(P[i],mul(out,16));return`<text class="lab v" x="${f1(p[0])}" y="${f1(p[1]+6)}" text-anchor="middle">${name}</text>`;}
+function fx(p,q){let s=(p===1?'':p===-1?MINUS:p)+'x';if(q>0)s+=' + '+q;else if(q<0)s+=' '+MINUS+' '+(-q);return s;}
+
+/* real-world scene art (fixed colors, like a picture) */
+const SC={
+ sky:(w=600,h=340)=>`<defs><linearGradient id="skyG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7ec8f0"/><stop offset="1" stop-color="#dff2fb"/></linearGradient></defs><rect width="${w}" height="${h}" fill="url(#skyG)"/>`,
+ sun:(x,y,r=20)=>{let s='';for(let i=0;i<8;i++){const a=i*Math.PI/4;s+=`<line x1="${f1(x+Math.cos(a)*(r+5))}" y1="${f1(y+Math.sin(a)*(r+5))}" x2="${f1(x+Math.cos(a)*(r+13))}" y2="${f1(y+Math.sin(a)*(r+13))}" stroke="#ffcf3a" stroke-width="3" stroke-linecap="round"/>`;}return s+`<circle cx="${x}" cy="${y}" r="${r}" fill="#ffd34d"/>`;},
+ cloud:(x,y,k=1)=>`<g fill="#fff" opacity=".92"><ellipse cx="${x}" cy="${y}" rx="${26*k}" ry="${12*k}"/><ellipse cx="${x-16*k}" cy="${y+3*k}" rx="${16*k}" ry="${9*k}"/><ellipse cx="${x+18*k}" cy="${y+3*k}" rx="${18*k}" ry="${9*k}"/><ellipse cx="${x+2*k}" cy="${y-8*k}" rx="${14*k}" ry="${10*k}"/></g>`,
+ grass:(y,w=600,h=340)=>`<rect x="0" y="${y}" width="${w}" height="${h-y}" fill="#5fae4a"/><rect x="0" y="${y}" width="${w}" height="5" fill="#4a9a3d"/>`,
+ concrete:(y,w=600,h=340)=>`<rect x="0" y="${y}" width="${w}" height="${h-y}" fill="#b9bec4"/><rect x="0" y="${y}" width="${w}" height="4" fill="#9ea4ab"/>`,
+ tree:(x,gy,h)=>`<rect x="${f1(x-h*.05)}" y="${f1(gy-h*.5)}" width="${f1(h*.1)}" height="${f1(h*.5)}" fill="#8b5a2b"/><ellipse cx="${x}" cy="${f1(gy-h*.66)}" rx="${f1(h*.24)}" ry="${f1(h*.34)}" fill="#2f8a3e"/><ellipse cx="${f1(x-h*.07)}" cy="${f1(gy-h*.75)}" rx="${f1(h*.1)}" ry="${f1(h*.14)}" fill="#3fa14f"/>`,
+ person:(x,gy,h,shirt='#e04866')=>{const r=h*.11;return`<g stroke-linecap="round"><line x1="${x}" y1="${f1(gy-h*.45)}" x2="${f1(x-h*.1)}" y2="${gy}" stroke="#2d3a4a" stroke-width="${f1(h*.07)}"/><line x1="${x}" y1="${f1(gy-h*.45)}" x2="${f1(x+h*.1)}" y2="${gy}" stroke="#2d3a4a" stroke-width="${f1(h*.07)}"/><line x1="${x}" y1="${f1(gy-h*.78)}" x2="${x}" y2="${f1(gy-h*.42)}" stroke="${shirt}" stroke-width="${f1(h*.16)}"/><line x1="${f1(x-h*.16)}" y1="${f1(gy-h*.6)}" x2="${f1(x+h*.16)}" y2="${f1(gy-h*.68)}" stroke="${shirt}" stroke-width="${f1(h*.06)}"/><circle cx="${x}" cy="${f1(gy-h+r)}" r="${f1(r)}" fill="#f1c27d"/></g>`;},
+ walls:(x0,x1,top,gy,col='#f3e3c3')=>{const w=x1-x0,h=gy-top;let s=`<rect x="${f1(x0)}" y="${f1(top)}" width="${f1(w)}" height="${f1(h)}" fill="${col}" stroke="#8a6d4a" stroke-width="2"/>`;
+  const dw=Math.min(36,w*.16),dh=Math.min(64,h*.62);s+=`<rect x="${f1(x0+w/2-dw/2)}" y="${f1(gy-dh)}" width="${f1(dw)}" height="${f1(dh)}" fill="#8b5a2b"/><circle cx="${f1(x0+w/2+dw*.3)}" cy="${f1(gy-dh*.45)}" r="2.5" fill="#ffd34d"/>`;
+  const ww=Math.min(40,w*.17),wy=top+h*.22;[x0+w*.2-ww/2,x0+w*.8-ww/2].forEach(wx=>{s+=`<rect x="${f1(wx)}" y="${f1(wy)}" width="${f1(ww)}" height="${f1(ww*.8)}" fill="#bfe6fa" stroke="#fff" stroke-width="3"/><line x1="${f1(wx+ww/2)}" y1="${f1(wy)}" x2="${f1(wx+ww/2)}" y2="${f1(wy+ww*.8)}" stroke="#fff" stroke-width="2"/>`;});return s;},
+ water:(y,h,w=600)=>`<rect x="0" y="${y}" width="${w}" height="${h}" fill="#4aa3df" opacity=".75"/>`+Array.from({length:6},(_,i)=>`<path d="M${40+i*95} ${f1(y+h*.4+(i%2)*10)} q10 -5 20 0 t20 0" stroke="#fff" stroke-width="2" fill="none" opacity=".7"/>`).join(''),
+};
+/* overlay triangle drawn on top of a real object */
+function overlayTri(P,fill='rgba(255,255,255,.18)'){return`<polygon points="${P.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" fill="${fill}" stroke="#16302a" stroke-width="3" stroke-linejoin="round"/>`;}
+
+
+bindSound();
+const KEY='roofraiser.v1';const SAVE=loadJ(KEY,{jobs:0,stars:0,streets:0,row:[]});
+let J=null,tries=0,done=false;
+function genAngles(mn=25,mx=120){for(;;){const a=ri(mn,mx),b=ri(mn,mx),c=180-a-b;if(c>=mn&&c<=mx&&a!==90&&b!==90&&c!==90&&a!==b)return[a,b,c];}}
+function baseTri(L,R,x0,x1,y,maxH){let w=x1-x0;const tL=Math.tan(L*D2R),tR=Math.tan(R*D2R);let ax,h;
+ if(L===90){ax=0;h=w*tR;}else if(R===90){ax=w;h=w*tL;}else{ax=w*tR/(tL+tR);h=ax*tL;}
+ if(h>maxH){const k=maxH/h;const cx=(x0+x1)/2;w*=k;ax*=k;h=maxH;x0=cx-w/2;}return[[x0,y],[x0+w,y],[x0+ax,y-h]];}
+const lab=(P,i,t,x)=>angleArc(P,i,x?'#e04866':'#16302a',1,22)+angleLabel(P,i,t,x?'lab x':'lab',true);
+const R90=(P,i)=>rightMark(P,i,14);
+const outdoor=(gy,extra='')=>SC.sky()+SC.sun(540,50)+SC.cloud(120,50)+SC.cloud(380,36,.8)+extra+SC.grass(gy);
+const tri=(P,fill)=>overlayTri(P,fill);
+const JOBS={
+ roof(){let ap;do{ap=2*ri(25,65);}while(ap===90);const b=(180-ap)/2;const P=baseTri(b,b,140,460,180,140);const askEave=Math.random()<.55;
+  let s=outdoor(300,SC.tree(70,300,120))+SC.walls(P[0][0]+16,P[1][0]-16,180,300)+tri(P,'rgba(181,82,59,.85)');
+  for(let k=1;k<5;k++){const y=P[2][1]+(180-P[2][1])*k/5;const t=(y-P[2][1])/(180-P[2][1]);s+=`<line x1="${f1(P[2][0]+(P[0][0]-P[2][0])*t)}" y1="${f1(y)}" x2="${f1(P[2][0]+(P[1][0]-P[2][0])*t)}" y2="${f1(y)}" stroke="#8e3f2c" stroke-width="2"/>`;}
+  s+=tri(P,'none')+ticksS(P,0,1)+ticksS(P,1,1)+(askEave?lab(P,2,ap+'°')+lab(P,0,'x',1):lab(P,0,b+'°')+lab(P,2,'x',1));
+  return{who:'Builder Bea',title:'Gable roof for a family house',story:askEave?`Both rafters are the same length (tick marks), so the roof is isosceles. The peak is ${ap}°. What angle <b>x</b> does each rafter make with the top of the wall?`:`Both rafters are the same length, and each meets the wall at ${b}°. What angle <b>x</b> is the peak?`,
+   svg:s,ans:askEave?b:ap,hint:'Isosceles: the two base angles are equal, and all three angles add to 180°.',why:askEave?`(180 ${MINUS} ${ap}) ÷ 2 = ${b}°`:`180 ${MINUS} ${b} ${MINUS} ${b} = ${ap}°`,icon:'house'};},
+ shed(){const R=ri(18,45),T=90-R;const P=baseTri(90,R,170,450,200,120);const askTop=Math.random()<.5;
+  let s=outdoor(300,SC.tree(520,300,140))+`<rect x="${f1(P[0][0])}" y="200" width="${f1(P[1][0]-P[0][0])}" height="100" fill="#c08a4d" stroke="#7a5228" stroke-width="2"/>`;
+  for(let x=P[0][0]+20;x<P[1][0];x+=22)s+=`<line x1="${f1(x)}" y1="200" x2="${f1(x)}" y2="300" stroke="#a5713a" stroke-width="2"/>`;
+  s+=`<rect x="${f1(P[0][0]+40)}" y="230" width="44" height="70" fill="#7a5228"/>`+tri(P,'rgba(90,110,130,.85)')+R90(P,0);
+  s+=askTop?lab(P,1,R+'°')+lab(P,2,'x',1):lab(P,2,T+'°')+lab(P,1,'x',1);
+  return{who:'Farmer Fran',title:'Lean-to shed roof',story:askTop?`The tall back post stands straight up (90°). The roof slopes down at ${R}°. What angle <b>x</b> is at the top, where the roof meets the post?`:`The back post is straight up (90°), and the roof meets it at ${T}°. What is the slope angle <b>x</b> at the low end?`,
+   svg:s,ans:askTop?T:R,hint:'A right triangle: the two other angles add up to 90°.',why:askTop?`90 ${MINUS} ${R} = ${T}°`:`90 ${MINUS} ${T} = ${R}°`,icon:'shed'};},
+ ramp(){const L=ri(10,35),T=90-L;const P=baseTri(L,90,90,500,300,170);
+  let s=SC.sky()+SC.sun(70,50)+SC.cloud(300,40)+SC.concrete(300)+`<rect x="520" y="230" width="70" height="70" fill="#9ea4ab"/><path d="M520 230h70" stroke="#6b7178" stroke-width="3"/>`;
+  s+=tri(P,'rgba(205,170,120,.95)')+`<path d="M${f1(P[1][0])} ${f1(P[2][1])} h40" stroke="#6b7178" stroke-width="5"/>`+R90(P,1);
+  const u=unitv(sub(P[2],P[0])),m=add(P[0],mul(sub(P[2],P[0]),.55));
+  s+=`<g transform="translate(${f1(m[0])} ${f1(m[1])}) rotate(${f1(-L)})"><rect x="-22" y="-8" width="44" height="5" rx="2" fill="#e04866"/><circle cx="-14" cy="-2" r="3" fill="#333"/><circle cx="14" cy="-2" r="3" fill="#333"/></g>`;
+  s+=SC.person(m[0]-8*u[1]+2,m[1]-9,46,'#3a92d8');
+  s+=lab(P,0,L+'°')+lab(P,2,'x',1);
+  return{who:'Skate park crew',title:'Skate ramp',story:`The ramp rises from the ground at ${L}°. Its back is a straight-up wall (90°). What angle <b>x</b> is at the top lip?`,svg:s,ans:T,hint:'Angles in a triangle add to 180°. One of them is 90°.',why:`180 ${MINUS} 90 ${MINUS} ${L} = ${T}°`,icon:'ramp'};},
+ ladder(){const L=ri(55,80),T=90-L;const P=baseTri(L,90,200,420,300,250);const askTop=Math.random()<.6;
+  let s=outdoor(300)+`<rect x="${f1(P[1][0])}" y="20" width="170" height="280" fill="#b3563f"/>`;
+  for(let y=30;y<300;y+=18)for(let x=P[1][0]+((y/18)%2?0:20);x<P[1][0]+170;x+=40)s+=`<rect x="${f1(x)}" y="${y}" width="38" height="16" fill="none" stroke="#8f3f2c" stroke-width="1.5"/>`;
+  s+=`<rect x="${f1(P[1][0]+70)}" y="60" width="50" height="40" fill="#bfe6fa" stroke="#fff" stroke-width="3"/><text x="${f1(P[1][0]+85)}" y="240" font-family="Bungee,Impact,sans-serif" font-size="22" fill="#fff">9</text>`;
+  s+=tri(P,'rgba(255,255,255,.25)');
+  const d=sub(P[2],P[0]),n=mul([-unitv(d)[1],unitv(d)[0]],7);[n,mul(n,-1)].forEach(o=>s+=`<line x1="${f1(P[0][0]+o[0])}" y1="${f1(P[0][1]+o[1])}" x2="${f1(P[2][0]+o[0])}" y2="${f1(P[2][1]+o[1])}" stroke="#d6a018" stroke-width="4"/>`);
+  for(let k=1;k<10;k++){const p=add(P[0],mul(d,k/10));s+=`<line x1="${f1(p[0]-n[0])}" y1="${f1(p[1]-n[1])}" x2="${f1(p[0]+n[0])}" y2="${f1(p[1]+n[1])}" stroke="#d6a018" stroke-width="3"/>`;}
+  const fp=add(P[0],mul(d,.6));s+=SC.person(fp[0]-4,fp[1]+6,46,'#e04866');
+  s+=R90(P,1)+(askTop?lab(P,0,L+'°')+lab(P,2,'x',1):lab(P,2,T+'°')+lab(P,0,'x',1));
+  return{who:'Fire Station 9',title:'Ladder against the wall',story:askTop?`Safety rules say the ladder must meet the ground at ${L}°. The wall is straight up. What angle <b>x</b> does the ladder make with the wall?`:`The ladder leans on the wall, making ${T}° with the wall. What angle <b>x</b> does it make with the ground?`,
+   svg:s,ans:askTop?T:L,hint:'Wall, ground and ladder make a right triangle. The two sharp angles add to 90°.',why:askTop?`90 ${MINUS} ${L} = ${T}°`:`90 ${MINUS} ${T} = ${L}°`,icon:'station'};},
+ bridge(){const[a,b,c]=genAngles(35,100);const P=baseTri(a,b,150,450,230,150);
+  let s=SC.sky()+SC.sun(540,46)+SC.cloud(90,40)+`<path d="M0 230 L80 230 L110 340 L0 340Z" fill="#5fae4a"/><path d="M600 230 L520 230 L490 340 L600 340Z" fill="#5fae4a"/>`+SC.water(250,90);
+  s+=`<rect x="40" y="230" width="520" height="12" fill="#6b4420"/>`+`<rect x="150" y="242" width="12" height="98" fill="#6b4420"/><rect x="440" y="242" width="12" height="98" fill="#6b4420"/>`;
+  s+=`<polygon points="${P.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" fill="rgba(255,255,255,.2)" stroke="#8b5a2b" stroke-width="9" stroke-linejoin="round"/>`+tri(P,'none')+lab(P,0,a+'°')+lab(P,1,b+'°')+lab(P,2,'x',1);
+  s+=SC.person(110,230,40,'#8a63d2');
+  return{who:'Engineer Eli',title:'Footbridge truss',story:`The truss beams meet the deck at ${a}° and ${b}°. What angle <b>x</b> must the top joint be cut at?`,svg:s,ans:c,hint:'All three angles of any triangle add to 180°.',why:`180 ${MINUS} ${a} ${MINUS} ${b} = ${c}°`,icon:'bridge'};},
+ overhang(){const[a,b,c]=genAngles(35,95);const P=baseTri(a,b,190,450,190,130);const E=180-a;const askExt=Math.random()<.55;
+  const d=unitv(sub(P[0],P[2])),T=add(P[0],mul(d,75));
+  let s=outdoor(300)+Array.from({length:14},(_,i)=>`<line x1="${30+i*42}" y1="${20+(i%3)*30}" x2="${24+i*42}" y2="${34+(i%3)*30}" stroke="#3a92d8" stroke-width="2" stroke-linecap="round"/>`).join('');
+  s+=SC.walls(P[0][0],P[1][0],190,300)+tri(P,'rgba(181,82,59,.85)')+`<line x1="${f1(P[2][0])}" y1="${f1(P[2][1])}" x2="${f1(T[0])}" y2="${f1(T[1])}" stroke="#8b5a2b" stroke-width="8" stroke-linecap="round"/>`+tri(P,'none');
+  s+=`<line x1="${f1(P[0][0])}" y1="${f1(P[0][1])}" x2="${f1(T[0])}" y2="${f1(T[1])}" stroke="#16302a" stroke-width="2.5" stroke-dasharray="6 5"/>`;
+  const dB=unitv(sub(P[1],P[0]));s+=arcS(P[0],d,dB,26,askExt?'#e04866':'#16302a');const bis=unitv(add(d,dB)),lp=add(P[0],mul(bis,50));
+  s+=`<text class="lab${askExt?' x':''}" x="${f1(lp[0])}" y="${f1(lp[1]+6)}" text-anchor="middle">${askExt?'x':E+'°'}</text>`;
+  s+=askExt?lab(P,1,b+'°')+lab(P,2,c+'°'):lab(P,2,c+'°')+lab(P,1,'x',1);
+  return{who:'Builder Bea',title:'Roof with a rain overhang',story:askExt?`The left rafter sticks out past the wall to keep rain off (dashed). The other roof angles are ${b}° and ${c}°. What is the outside angle <b>x</b> between the overhang and the ceiling beam?`:`The outside angle at the overhang is ${E}°, and the peak is ${c}°. What angle <b>x</b> is at the right wall?`,
+   svg:s,ans:askExt?E:b,hint:'Exterior angle rule: the outside angle equals the two far-away inside angles added together.',why:askExt?`${b} + ${c} = ${E}°`:`${E} ${MINUS} ${c} = ${b}°`,icon:'house'};},
+ lumber(){let s1,s2;do{s1=ri(3,14);s2=ri(3,14);}while(s1===s2);const big=Math.random()<.5,lo=Math.abs(s1-s2)+1,hi=s1+s2-1;
+  const third=(lo+hi)/2;const angs=anglesFromSides(third,s1,s2);// vertex0 is the hinge where the two boards meet
+  let P=rawTri([angs[1],angs[2],angs[0]],0);// put hinge on top
+  P=place(P,{x:150,y:60,w:300,h:200},fitScale(P,{x:150,y:60,w:300,h:200}));
+  let s=`<rect width="600" height="340" fill="#e9d3b4"/>`+Array.from({length:9},(_,i)=>`<line x1="0" y1="${i*40}" x2="600" y2="${i*40}" stroke="#d8bd98" stroke-width="2"/>`).join('');
+  s+=`<rect x="20" y="290" width="560" height="30" fill="#8b5a2b" opacity=".35"/>`;
+  const H=P[2],A=P[0],B=P[1];
+  const boardS=(p,q,c)=>{const d=unitv(sub(q,p)),n=[-d[1]*9,d[0]*9];return`<polygon points="${[add(p,n),add(q,n),sub(q,n),sub(p,n)].map(v=>f1(v[0])+','+f1(v[1])).join(' ')}" fill="${c}" stroke="#7a5228" stroke-width="2"/>`;};
+  s+=boardS(H,A,'#d9a45c')+boardS(H,B,'#c99450')+`<circle cx="${f1(H[0])}" cy="${f1(H[1])}" r="8" fill="#6b7178"/>`;
+  s+=`<line x1="${f1(A[0])}" y1="${f1(A[1])}" x2="${f1(B[0])}" y2="${f1(B[1])}" stroke="#e04866" stroke-width="4" stroke-dasharray="10 8"/>`;
+  s+=sideLabel([A,B,H],0,s2+' ft')+sideLabel([A,B,H],1,s1+' ft')+sideLabel([A,B,H],2,'? ft','lab x');
+  s+=`<text class="lab" x="20" y="34" style="font-size:14px">CARPENTER'S BENCH · boards come in whole feet</text>`;
+  return{who:'Carpenter Cal',title:'Triangle frame from three boards',story:`Two boards (${s1} ft and ${s2} ft) are hinged together. You need a third board to close the gap. What is the <b>${big?'longest':'shortest'}</b> whole-number board that still makes a triangle?`,svg:s,ans:big?hi:lo,
+   hint:'Any two sides must add up to MORE than the third. Too long and the hinged boards can\'t reach its ends; too short and they fold flat.',why:`The third board must be longer than ${Math.max(s1,s2)} ${MINUS} ${Math.min(s1,s2)} = ${Math.abs(s1-s2)} and shorter than ${s1} + ${s2} = ${s1+s2}, so it can be ${lo} to ${hi} ft.`,icon:'frame'};},
+ barn(){for(;;){const x=ri(8,30),p=[ri(1,3),ri(1,3),ri(1,3)],q1=5*ri(-2,6),q2=5*ri(-2,6),A=p[0]*x+q1,B=p[1]*x+q2,C=180-A-B,q3=C-p[2]*x;
+  if(A<30||B<30||C<30||A>110||B>110||C>110||Math.abs(q3)>60)continue;const P=baseTri(A,B,150,450,190,140);
+  let s=outdoor(300,SC.tree(540,300,130))+`<rect x="${f1(P[0][0]+10)}" y="190" width="${f1(P[1][0]-P[0][0]-20)}" height="110" fill="#b3363a" stroke="#7d2226" stroke-width="2"/>`;
+  const cx=(P[0][0]+P[1][0])/2;s+=`<rect x="${f1(cx-40)}" y="220" width="80" height="80" fill="#fff"/><path d="M${f1(cx-40)} 220l80 80M${f1(cx+40)} 220l-80 80" stroke="#b3363a" stroke-width="5"/>`;
+  s+=tri(P,'rgba(120,40,40,.9)')+tri(P,'none')+lab(P,0,`(${fx(p[0],q1)})°`)+lab(P,1,`(${fx(p[1],q2)})°`)+lab(P,2,`(${fx(p[2],q3)})°`);
+  const PP=p[0]+p[1]+p[2],QQ=q1+q2+q3;
+  return{who:'Architect Ana',title:'Barn roof from a smudged blueprint',story:'The blueprint for this barn roof only gives the angles as expressions. Solve for <b>x</b> so the crew can cut every rafter.',svg:s,ans:x,
+   hint:'All three angles still add to 180°. Add the expressions together and set the total equal to 180.',why:`${fx(PP,QQ)} = 180 → ${PP}x = ${180-QQ} → x = ${x}`,icon:'barn'};}},
+};
+function pool(){const n=SAVE.jobs;if(n<3)return['roof','shed','ramp'];if(n<7)return['roof','shed','ramp','ladder','bridge'];if(n<12)return['roof','ladder','bridge','overhang','lumber'];return['roof','bridge','overhang','lumber','barn','barn','ladder'];}
+
+const ICONS={house:'<path d="M0 30 20 12l20 18z" fill="var(--hot)"/><rect x="5" y="30" width="30" height="24" fill="var(--surface)" stroke="var(--steel)" stroke-width="2"/>',
+ shed:'<path d="M2 26V12l36 14z" fill="var(--sky)"/><rect x="2" y="26" width="36" height="28" fill="var(--surface)" stroke="var(--steel)" stroke-width="2"/>',
+ ramp:'<path d="M0 54h40V30z" fill="var(--sky)"/>',station:'<rect x="4" y="16" width="32" height="38" fill="var(--hot)"/><path d="M8 54 30 18" stroke="var(--gold)" stroke-width="4"/>',
+ bridge:'<rect x="0" y="40" width="40" height="5" fill="var(--steel)"/><path d="M4 40 20 22l16 18" stroke="var(--steel)" stroke-width="3" fill="none"/>',barn:'<path d="M0 30 20 12l20 18z" fill="#7d2226"/><rect x="5" y="30" width="30" height="24" fill="#b3363a"/>',frame:'<path d="M4 54 20 20l16 34z" fill="none" stroke="var(--gold)" stroke-width="5"/>'};
+function drawStreet(){let s=`<rect x="0" y="70" width="600" height="20" fill="var(--line)"/>`;
+ for(let i=0;i<8;i++){const b=SAVE.row[i];const x=16+i*73;s+=b?`<g transform="translate(${x+14} 16)">${ICONS[b.icon]}</g><text x="${x+34}" y="86" text-anchor="middle" font-size="10" fill="var(--gold)">${'★'.repeat(b.st)}</text>`:`<rect x="${x+14}" y="40" width="40" height="30" rx="4" fill="none" stroke="var(--line)" stroke-dasharray="4 4"/>`;}
+ $('#streetSvg').innerHTML=s+`<text class="kind" x="8" y="14" style="font:500 11px var(--f-math);fill:var(--muted)">STREET ${SAVE.streets+1} · ${SAVE.row.length}/8 BUILT</text>`;}
+function paintHUD(){$('#jobs').textContent=SAVE.jobs;$('#stars').textContent=SAVE.stars;drawStreet();}
+function msg(t,c=''){const m=$('#msg');m.textContent=t;m.className='msg '+c;}
+
+function next(){const k=pick(pool());J=JOBS[k]();tries=0;done=false;
+ $('#job').innerHTML=`<div class="who">Job from ${J.who}</div><h2>${J.title}</h2><p>${J.story}</p>`;$('#scene').innerHTML=J.svg;$('#stage').classList.remove('built');
+ $('#ans').value='';$('#ansRow').hidden=false;$('#nextB').hidden=true;$('#sol').hidden=true;msg('Take your time. Type the angle (or length), then cut.');paintHUD();
+ if(!matchMedia('(pointer:coarse)').matches)$('#ans').focus();}
+function submit(){if(done)return;const raw=$('#ans').value.trim().replace(MINUS,'-').replace('°','');if(raw===''||isNaN(+raw)){shakeEl($('#ansRow'));msg('Type a number first.','bad');return;}
+ if(Math.abs(+raw-J.ans)<.01){done=true;const st=tries===0?3:tries===1?2:1;SAVE.jobs++;SAVE.stars+=st;SAVE.row.push({icon:J.icon,st});
+  $('#stage').classList.add('built');sfx.win();confetti($('#stage'),60);$('#ansRow').hidden=true;$('#sol').hidden=false;$('#sol').innerHTML=`✓ ${J.why}`;
+  msg(`Perfect cut! ${'★'.repeat(st)} ${st===3?'First try!':''}`,'good');
+  if(SAVE.row.length>=8){SAVE.streets++;const s=SAVE.row.reduce((t,b)=>t+b.st,0);saveJ(KEY,SAVE);paintHUD();
+   setTimeout(()=>{showCard(`<h2>Street ${SAVE.streets} finished!</h2><p>8 jobs, ${s} of 24 stars. The neighborhood is moving in.</p><div class="row"><button class="btn primary" id="ns">Start a new street</button></div>`);$('#ns').onclick=()=>{hideCard();SAVE.row=[];saveJ(KEY,SAVE);next();};confetti(null,120);},900);}
+  else{saveJ(KEY,SAVE);paintHUD();$('#nextB').hidden=false;$('#nextB').focus();}}
+ else{tries++;sfx.bad();shakeEl($('#stage'));
+  if(tries===1)msg(`That piece won't fit. Hint: ${J.hint}`,'bad');
+  else{msg(`Still a gap. Here's how the pros work it out:`,'bad');$('#sol').hidden=false;$('#sol').innerHTML=`${J.why}<br>Type <b>${J.ans}</b> to make the cut.`;}}}
+$('#go').onclick=submit;$('#nextB').onclick=next;
+$('#ans').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submit();}});
+document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;if(!$('#overlay').hidden){const p=$('#card .primary');if(p){e.preventDefault();p.click();}}else if(!$('#nextB').hidden&&document.activeElement!==$('#ans')){e.preventDefault();next();}});
+next();
+if(!SAVE.jobs)showCard(`<h2>Roof Raiser</h2><p>You're the carpenter. Every job is a real triangle: roofs, ramps, ladders, bridges. Work out the angle, make the cut, and build up your street.</p>
+ <ul><li>Triangle angles add to <b>180°</b></li><li>A right angle (the little square) is <b>90°</b></li><li>Equal sides (tick marks) mean equal base angles</li><li>No clock. A wrong cut gets you a hint, then the full method.</li></ul><div class="row"><button class="btn primary" id="st">Start the first job</button></div>`),$('#st')&&($('#st').onclick=hideCard);
+
+})();</script></body></html>

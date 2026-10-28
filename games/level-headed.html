@@ -1,0 +1,454 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Level Headed</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=DM+Mono:wght@500&family=Nunito:wght@600;700;800;900&display=swap"><style>:root{
+  --bg:#e3eee7; --surface:#f7fbf8; --ink:#16302a; --muted:#587168; --line:#bcd2c7; --steel:#33524a;
+  --gold:#c58a1a; --gold-hi:#e9b84f; --hot:#e04866; --sky:#2f86d0; --violet:#7b52cf;
+  --good:#23925a; --bad:#cf3e35; --shadow:rgba(22,48,42,.14); --tint:rgba(47,134,208,.10);
+  --f-display:"Bungee","Impact",system-ui,sans-serif;
+  --f-body:"Nunito",ui-rounded,system-ui,sans-serif;
+  --f-math:"DM Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1d19; --surface:#172a24; --ink:#e1eee7; --muted:#8fb0a4; --line:#2a443b; --steel:#a9c6bc;
+  --gold:#e0a637; --gold-hi:#f6cd70; --hot:#ff6681; --sky:#5cb0f2; --violet:#a98af0;
+  --good:#47c483; --bad:#ff6a5e; --shadow:rgba(0,0,0,.35); --tint:rgba(92,176,242,.12); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1d19; --surface:#172a24; --ink:#e1eee7; --muted:#8fb0a4; --line:#2a443b; --steel:#a9c6bc;
+  --gold:#e0a637; --gold-hi:#f6cd70; --hot:#ff6681; --sky:#5cb0f2; --violet:#a98af0;
+  --good:#47c483; --bad:#ff6a5e; --shadow:rgba(0,0,0,.35); --tint:rgba(92,176,242,.12); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;padding:12px 16px 28px}
+[hidden]{display:none!important}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.title{font-family:var(--f-display);font-size:20px;line-height:1;margin-right:auto}
+.title span{color:var(--hot)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--surface);border:1.5px solid var(--line);font-weight:800;font-variant-numeric:tabular-nums;font-size:14px}
+.pill b{font-size:16px}
+.pill.hot{border-color:var(--hot);color:var(--hot)}
+.hearts{color:var(--hot);letter-spacing:2px}
+.iconbtn{width:36px;height:36px;border-radius:12px;background:var(--surface);border:1.5px solid var(--line);display:grid;place-items:center;font-weight:900}
+.stage{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;overflow:hidden;position:relative}
+.stage svg{display:block;width:100%;height:auto}
+.lab{font-family:var(--f-math);font-size:17px;font-weight:500;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round}
+.lab.x{fill:var(--hot);font-weight:700}
+.lab.v{font-family:var(--f-display);font-size:15px;fill:var(--muted)}
+.tri{fill:var(--tint);stroke:var(--ink);stroke-width:2.5;stroke-linejoin:round}
+.arc{fill:none;stroke-width:2.2}
+.prompt{font-weight:900;font-size:18px;text-align:center;text-wrap:balance}
+.prompt .m{font-family:var(--f-math);color:var(--hot)}
+.msg{min-height:1.4em;font-weight:800;color:var(--muted);text-align:center;font-size:15px;text-wrap:balance}
+.msg.bad{color:var(--bad)} .msg.good{color:var(--good)}
+.answer{display:flex;gap:8px}
+.num{flex:1;min-width:0;font-family:var(--f-math);font-size:24px;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
+.btn{padding:12px 18px;border-radius:14px;font-weight:900;border:1.5px solid var(--line);background:var(--surface)}
+.btn.primary{background:var(--hot);color:#fff;border-color:var(--hot);box-shadow:0 4px 0 color-mix(in srgb,var(--hot) 60%,#000)}
+.btn.primary:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--hot) 60%,#000)}
+.choices{display:grid;gap:8px}
+.choice{padding:12px 6px;border-radius:14px;border:2px solid var(--line);background:var(--surface);font-weight:900;font-size:15px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .08s}
+.choice:active{transform:scale(.97)}
+.choice kbd{font-family:var(--f-math);font-size:11px;color:var(--muted);font-weight:500}
+.choice[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.choice[aria-pressed="true"] kbd{color:inherit;opacity:.7}
+.choice.right{background:var(--good);border-color:var(--good);color:#fff}
+.choice.wrong{background:var(--bad);border-color:var(--bad);color:#fff}
+.rowlabel{font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 72%,transparent);display:grid;place-items:center;z-index:20;padding:16px;overflow:auto}
+.card{background:var(--surface);border:2px solid var(--ink);border-radius:24px;padding:24px;width:min(400px,100%);text-align:center;display:flex;flex-direction:column;gap:12px;box-shadow:0 18px 40px var(--shadow);animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+.card h2{font-family:var(--f-display);font-size:28px;margin:0;line-height:1.05}
+.card p{margin:0;color:var(--muted);font-weight:700;line-height:1.4}
+.card .big{font-family:var(--f-display);font-size:40px;color:var(--hot)}
+.card .row{display:flex;gap:8px}
+.card .row button{flex:1}
+.card ul{margin:0;padding:0 0 0 18px;text-align:left;color:var(--ink);font-weight:700;line-height:1.5;font-size:15px}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.bump{display:inline-block;animation:bump .35s}
+@keyframes bump{40%{transform:scale(1.35)}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;height:100%}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.hero h1{font-family:var(--f-display);font-size:clamp(28px,7vw,44px);line-height:1;margin:0;text-wrap:balance}
+.hero p{margin:6px 0 0;color:var(--muted);font-weight:700;max-width:56ch;line-height:1.45}
+.worlds{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px}
+.world{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.world.locked{opacity:.55}
+.whead{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.whead .num{font-family:var(--f-display);color:var(--muted);font-size:13px}
+.whead h3{margin:0;font-size:18px;font-weight:900}
+.world .blurb{margin:0;font-size:14px;color:var(--muted);font-weight:700;line-height:1.4}
+.lvls{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.lvl{aspect-ratio:1;max-width:100%;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;font-size:15px;line-height:1}
+.lvl small{font-size:8px;color:var(--gold);margin-top:2px;height:9px;letter-spacing:-.5px}
+.lvl:disabled{cursor:not-allowed;color:var(--muted);opacity:.6}
+.lvl.next{border-color:var(--hot);box-shadow:0 0 0 2px var(--hot) inset}
+@media (max-width:440px){.lvls{grid-template-columns:repeat(4,1fr)}}
+.where{font-weight:900;margin-right:auto}
+.where small{display:block;color:var(--muted);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.story{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:10px 14px;font-weight:700;line-height:1.45;font-size:15px}
+.story b{color:var(--hot)}
+.stage svg .it{cursor:pointer}
+.stage svg .it:hover{filter:brightness(1.15)}
+.eq{font-family:var(--f-math);font-size:clamp(24px,7vw,42px);display:flex;align-items:center;gap:.35em;flex-wrap:wrap;justify-content:center;font-variant-numeric:tabular-nums}
+.eq .t-x{color:var(--hot)} .eq .t-n{color:var(--gold)} .eq .t-neg{color:var(--sky)} .eq .rel{color:var(--muted)} .eq .rel.off{color:var(--bad)}
+.legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:13px;font-weight:800;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.deck{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ops{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.op,.pan{padding:10px 6px;border-radius:14px;border:2px solid var(--line);background:var(--bg);font-weight:900;display:flex;flex-direction:column;align-items:center;gap:2px}
+.op b{font-family:var(--f-math);font-size:24px;line-height:1}
+.op span,.pan span{font-size:11.5px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.pan{font-size:16px}
+.op[aria-pressed="true"],.pan[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.op[aria-pressed="true"] span,.pan[aria-pressed="true"] span{color:inherit;opacity:.75}
+.pan.needs{border-color:var(--hot);box-shadow:0 0 0 2px var(--hot) inset}
+.readout{font-family:var(--f-math);font-size:22px;padding:10px 14px;border-radius:14px;background:var(--bg);border:2px dashed var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.readout .ph{color:var(--muted);font-family:var(--f-body);font-size:14px;font-weight:700}
+.keys{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.keys .xk,.keys .wide{grid-column:span 2}
+.key{padding:11px 0;border-radius:12px;background:var(--bg);border:1.5px solid var(--line);font-family:var(--f-math);font-size:19px;box-shadow:0 2px 0 var(--line)}
+.key:active{transform:translateY(2px);box-shadow:none}
+.key.xk{color:var(--hot);font-family:var(--f-body);font-weight:900;font-size:15px}
+.key.xk[aria-pressed="true"]{background:var(--hot);color:#fff;border-color:var(--hot)}
+.apply{width:100%}
+.tools{display:flex;gap:8px}
+.tool{flex:1;padding:10px;border-radius:12px;border:1.5px solid var(--line);font-weight:800;font-size:14px;color:var(--muted)}
+.tiptxt{font-size:13px;color:var(--muted);font-weight:700;text-align:center}
+</style></head><body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="title">Level<span>/</span>Headed</div>
+    <div class="pill">★ <b id="totStars">0</b> / 144</div>
+    <button class="iconbtn" id="sndBtn"></button>
+  </div>
+
+  <section id="menu" class="wrap" style="width:100%">
+    <div class="hero">
+      <h1>The Gumball Shop Scale</h1>
+      <p>Every paper bag holds the same secret number of gumballs, and the shop scale is balanced. Change one pan and the scale tips, so you have to make the same change to the other pan to level it again. Keep going until one bag sits alone. No clock.</p>
+    </div>
+    <div class="worlds" id="worlds"></div>
+  </section>
+
+  <section id="play" class="wrap" style="width:100%" hidden>
+    <div class="top">
+      <button class="iconbtn" id="backBtn" aria-label="Back to levels">←</button>
+      <div class="where" id="where"></div>
+      <div class="pill" id="movesPill"></div>
+    </div>
+    <div class="story" id="story"></div>
+    <div class="stage" id="stage">
+      <svg viewBox="0 0 640 340" role="img" aria-label="Candy shop scale" id="scaleSvg">
+        <defs><linearGradient id="gBrass" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f3c45c"/><stop offset="1" stop-color="#c58a1a"/></linearGradient></defs>
+        <g id="shop"></g>
+        <path d="M250 318 L390 318 L372 300 L268 300Z" fill="#33524a"/>
+        <rect x="314" y="134" width="12" height="170" rx="4" fill="#33524a"/>
+        <g id="panL"></g><g id="panR"></g>
+        <g id="beam">
+          <rect x="108" y="125" width="424" height="10" rx="5" fill="#33524a"/>
+          <path d="M320 112 L305 134 L335 134Z" fill="#33524a"/>
+          <circle cx="320" cy="130" r="9" fill="url(#gBrass)" stroke="#33524a" stroke-width="3"/>
+          <path d="M320 118 L320 102" stroke="#e04866" stroke-width="4" stroke-linecap="round"/>
+        </g>
+        <g id="tipSign"></g>
+      </svg>
+    </div>
+    <div class="tiptxt">Tip: tap a gumball, bag or balloon on the scale to take it off just that pan (tapping a balloon pops it).</div>
+    <div class="legend"><span><i style="background:#c58a1a"></i>bag = x gumballs</span><span><i style="background:#e04866;border-radius:50%"></i>1 gumball</span><span><i style="background:#3a92d8;border-radius:50%"></i>balloon = −1</span></div>
+    <div class="eq" id="eq" aria-live="polite"></div>
+    <div class="msg" id="msg"></div>
+    <div class="deck" id="deck">
+      <div class="seg" role="group" aria-label="Which pan">
+        <button class="pan" data-pan="L">Left pan<span>change this side</span></button>
+        <button class="pan" data-pan="R">Right pan<span>change this side</span></button>
+      </div>
+      <div class="ops" role="group" aria-label="Move">
+        <button class="op" data-op="+"><b>+</b><span>Put on</span></button>
+        <button class="op" data-op="-"><b>−</b><span>Take off</span></button>
+        <button class="op" data-op="/"><b>÷</b><span>Split, keep 1 group</span></button>
+      </div>
+      <button class="btn" id="pairBtn">Pair up gumballs + balloons on this pan (they cancel)</button>
+      <div class="readout" id="readout"></div>
+      <div class="keys" id="keys"></div>
+      <button class="btn primary apply" id="applyBtn">Do it</button>
+      <div class="tools">
+        <button class="tool" id="undoBtn">↶ Undo</button>
+        <button class="tool" id="hintBtn">Hint</button>
+        <button class="tool" id="resetBtn">⟲ Restart</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="overlay" hidden><div class="card" id="card"></div></div><canvas id="fx"></canvas>
+<script>(()=>{
+const $=s=>document.querySelector(s);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const MINUS='−';
+const sgn=n=>String(n).replace('-',MINUS);
+function loadJ(k,d){try{const t=localStorage.getItem(k);return t?Object.assign(d,JSON.parse(t)):d;}catch(e){return d;}}
+function saveJ(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+/* sound */
+const SND=loadJ('arcade.sound',{on:true});
+let AC=null;
+function tone(f,d=.1,type='triangle',v=.12,delay=0,slide){if(!SND.on)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state!=='running')AC.resume();
+ const t=AC.currentTime+delay,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);
+ g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.03);}catch(e){}}
+const sfx={
+ tap:()=>tone(620,.05,'sine',.06),
+ good:(n=1)=>{const sc=[523,587,659,784,880,1047,1175];const f=sc[Math.min(n-1,6)];tone(f,.14,'triangle',.12);tone(f*1.5,.18,'sine',.06,.06);},
+ bad:()=>{tone(150,.18,'square',.05);tone(110,.22,'square',.05,.09);},
+ win:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.22,'triangle',.12,i*.08)),
+ over:()=>[392,330,262,196].forEach((f,i)=>tone(f,.28,'triangle',.1,i*.12)),
+ whoosh:()=>tone(300,.25,'sine',.06,0,900)};
+function bindSound(){const b=$('#sndBtn');if(!b)return;const p=()=>{b.textContent=SND.on?'♪':'×';b.setAttribute('aria-label',SND.on?'Mute sound':'Turn sound on');};p();
+ b.onclick=()=>{SND.on=!SND.on;saveJ('arcade.sound',SND);p();if(SND.on)sfx.tap();};}
+function shakeEl(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
+function bump(el){el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');}
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const mult=st=>Math.min(5,1+Math.floor(st/3));
+const hearts=n=>'♥'.repeat(Math.max(0,n))+'<span style="opacity:.25">'+'♥'.repeat(Math.max(0,3-n))+'</span>';
+
+/* overlay */
+function showCard(html){$('#card').innerHTML=html;$('#overlay').hidden=false;const p=$('#card .primary');if(p)setTimeout(()=>p.focus(),30);}
+function hideCard(){$('#overlay').hidden=true;}
+
+/* confetti */
+let FXP=[],FXrun=false;
+function confetti(el,n=80){if(RM)return;const cv=$('#fx'),cx=cv.getContext('2d'),dpr=devicePixelRatio||1;cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;
+ const cols=['--hot','--gold-hi','--sky','--good','--violet'].map(cssv);const r=(el||document.body).getBoundingClientRect();
+ for(let i=0;i<n;i++)FXP.push({x:(r.left+r.width/2)*dpr,y:(r.top+r.height*.4)*dpr,vx:(Math.random()-.5)*16,vy:-Math.random()*13-4,s:(4+Math.random()*5)*dpr,c:cols[i%5],a:Math.random()*6,va:(Math.random()-.5)*.3,life:1});
+ if(!FXrun){FXrun=true;const step=()=>{cx.clearRect(0,0,cv.width,cv.height);FXP=FXP.filter(p=>p.life>0);
+  FXP.forEach(p=>{p.vy+=.45;p.x+=p.vx*dpr*.6;p.y+=p.vy*dpr*.6;p.a+=p.va;p.life-=.013;cx.save();cx.globalAlpha=Math.max(0,p.life);cx.translate(p.x,p.y);cx.rotate(p.a);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore();});
+  if(FXP.length)requestAnimationFrame(step);else{FXrun=false;cx.clearRect(0,0,cv.width,cv.height);}};requestAnimationFrame(step);}}
+
+/* triangle geometry. Vertex i has angle angs[i]; side i is opposite vertex i. */
+const D2R=Math.PI/180;
+function rawTri(angs,rot=0,mirror=false){const[A,,C]=angs.map(a=>a*D2R),B=angs[1]*D2R;
+ let P=[[0,0],[Math.sin(C),0],[Math.sin(B)*Math.cos(A),Math.sin(B)*Math.sin(A)]].map(([x,y])=>[mirror?-x:x,-y]);
+ const c=Math.cos(rot),s=Math.sin(rot);return P.map(([x,y])=>[x*c-y*s,x*s+y*c]);}
+function bbox(P){const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);return{x0:Math.min(...xs),x1:Math.max(...xs),y0:Math.min(...ys),y1:Math.max(...ys)};}
+function fitScale(P,box,unit=1){const b=bbox(P);return Math.min(box.w/((b.x1-b.x0)*unit),box.h/((b.y1-b.y0)*unit));}
+function place(P,box,scale,unit=1){const b=bbox(P),k=scale*unit,cx=box.x+box.w/2-(b.x0+b.x1)/2*k,cy=box.y+box.h/2-(b.y0+b.y1)/2*k;return P.map(([x,y])=>[cx+x*k,cy+y*k]);}
+function layoutTri(angs,box,rot=0,mirror=false){const P=rawTri(angs,rot,mirror);return place(P,box,fitScale(P,box));}
+function anglesFromSides(a,b,c){const A=Math.acos((b*b+c*c-a*a)/(2*b*c))/D2R,B=Math.acos((a*a+c*c-b*b)/(2*a*c))/D2R;return[A,B,180-A-B];}
+const sub=(p,q)=>[p[0]-q[0],p[1]-q[1]],add=(p,q)=>[p[0]+q[0],p[1]+q[1]],mul=(p,k)=>[p[0]*k,p[1]*k],len=p=>Math.hypot(p[0],p[1]),unitv=p=>mul(p,1/len(p));
+const f1=n=>Math.round(n*10)/10;
+function polyS(P,cls='tri',extra=''){return`<polygon class="${cls}" points="${P.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" ${extra}/>`;}
+function arcS(V,d1,d2,r,color,n=1){let s='';const cr=d1[0]*d2[1]-d1[1]*d2[0],sw=cr>0?1:0;
+ for(let k=0;k<n;k++){const rr=r+k*5,a=add(V,mul(d1,rr)),b=add(V,mul(d2,rr));s+=`<path class="arc" stroke="${color}" d="M${f1(a[0])} ${f1(a[1])} A${rr} ${rr} 0 0 ${sw} ${f1(b[0])} ${f1(b[1])}"/>`;}return s;}
+function vertDirs(P,i){const V=P[i],U=P[(i+1)%3],W=P[(i+2)%3];return[V,unitv(sub(U,V)),unitv(sub(W,V))];}
+function angleArc(P,i,color,n=1,r=20){const[V,d1,d2]=vertDirs(P,i);return arcS(V,d1,d2,r,color,n);}
+function rightMark(P,i,s=14){const[V,d1,d2]=vertDirs(P,i);const a=add(V,mul(d1,s)),b=add(a,mul(d2,s)),c=add(V,mul(d2,s));return`<path class="arc" stroke="var(--ink)" d="M${f1(a[0])} ${f1(a[1])} L${f1(b[0])} ${f1(b[1])} L${f1(c[0])} ${f1(c[1])}"/>`;}
+function angleLabel(P,i,text,cls='lab',inside=false){const[V,d1,d2]=vertDirs(P,i);const bis=unitv(add(d1,d2));
+ const w=text.length,dist=inside?Math.min(64,30+600/Math.max(10,angOf(d1,d2))):18+w*3.2;const p=add(V,mul(bis,inside?dist:-dist));
+ return`<text class="${cls}" x="${f1(p[0])}" y="${f1(p[1]+6)}" text-anchor="middle">${text}</text>`;}
+function angOf(d1,d2){return Math.acos(Math.max(-1,Math.min(1,d1[0]*d2[0]+d1[1]*d2[1])))/D2R;}
+function centroid(P){return[(P[0][0]+P[1][0]+P[2][0])/3,(P[0][1]+P[1][1]+P[2][1])/3];}
+function sideEnds(P,i){return[P[(i+1)%3],P[(i+2)%3]];}
+function ticksS(P,i,n){const[a,b]=sideEnds(P,i),M=mul(add(a,b),.5),t=unitv(sub(b,a)),nn=[-t[1],t[0]];let s='';
+ for(let k=0;k<n;k++){const o=add(M,mul(t,(k-(n-1)/2)*7)),p=add(o,mul(nn,8)),q=add(o,mul(nn,-8));s+=`<line x1="${f1(p[0])}" y1="${f1(p[1])}" x2="${f1(q[0])}" y2="${f1(q[1])}" stroke="var(--hot)" stroke-width="2.5" stroke-linecap="round"/>`;}return s;}
+function sideLabel(P,i,text,cls='lab'){const[a,b]=sideEnds(P,i),M=mul(add(a,b),.5),C=centroid(P),out=unitv(sub(M,C));const p=add(M,mul(out,14+text.length*2.6));
+ return`<text class="${cls}" x="${f1(p[0])}" y="${f1(p[1]+6)}" text-anchor="middle">${text}</text>`;}
+function vertexName(P,i,name){const C=centroid(P),out=unitv(sub(P[i],C)),p=add(P[i],mul(out,16));return`<text class="lab v" x="${f1(p[0])}" y="${f1(p[1]+6)}" text-anchor="middle">${name}</text>`;}
+function fx(p,q){let s=(p===1?'':p===-1?MINUS:p)+'x';if(q>0)s+=' + '+q;else if(q<0)s+=' '+MINUS+' '+(-q);return s;}
+
+/* real-world scene art (fixed colors, like a picture) */
+const SC={
+ sky:(w=600,h=340)=>`<defs><linearGradient id="skyG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7ec8f0"/><stop offset="1" stop-color="#dff2fb"/></linearGradient></defs><rect width="${w}" height="${h}" fill="url(#skyG)"/>`,
+ sun:(x,y,r=20)=>{let s='';for(let i=0;i<8;i++){const a=i*Math.PI/4;s+=`<line x1="${f1(x+Math.cos(a)*(r+5))}" y1="${f1(y+Math.sin(a)*(r+5))}" x2="${f1(x+Math.cos(a)*(r+13))}" y2="${f1(y+Math.sin(a)*(r+13))}" stroke="#ffcf3a" stroke-width="3" stroke-linecap="round"/>`;}return s+`<circle cx="${x}" cy="${y}" r="${r}" fill="#ffd34d"/>`;},
+ cloud:(x,y,k=1)=>`<g fill="#fff" opacity=".92"><ellipse cx="${x}" cy="${y}" rx="${26*k}" ry="${12*k}"/><ellipse cx="${x-16*k}" cy="${y+3*k}" rx="${16*k}" ry="${9*k}"/><ellipse cx="${x+18*k}" cy="${y+3*k}" rx="${18*k}" ry="${9*k}"/><ellipse cx="${x+2*k}" cy="${y-8*k}" rx="${14*k}" ry="${10*k}"/></g>`,
+ grass:(y,w=600,h=340)=>`<rect x="0" y="${y}" width="${w}" height="${h-y}" fill="#5fae4a"/><rect x="0" y="${y}" width="${w}" height="5" fill="#4a9a3d"/>`,
+ concrete:(y,w=600,h=340)=>`<rect x="0" y="${y}" width="${w}" height="${h-y}" fill="#b9bec4"/><rect x="0" y="${y}" width="${w}" height="4" fill="#9ea4ab"/>`,
+ tree:(x,gy,h)=>`<rect x="${f1(x-h*.05)}" y="${f1(gy-h*.5)}" width="${f1(h*.1)}" height="${f1(h*.5)}" fill="#8b5a2b"/><ellipse cx="${x}" cy="${f1(gy-h*.66)}" rx="${f1(h*.24)}" ry="${f1(h*.34)}" fill="#2f8a3e"/><ellipse cx="${f1(x-h*.07)}" cy="${f1(gy-h*.75)}" rx="${f1(h*.1)}" ry="${f1(h*.14)}" fill="#3fa14f"/>`,
+ person:(x,gy,h,shirt='#e04866')=>{const r=h*.11;return`<g stroke-linecap="round"><line x1="${x}" y1="${f1(gy-h*.45)}" x2="${f1(x-h*.1)}" y2="${gy}" stroke="#2d3a4a" stroke-width="${f1(h*.07)}"/><line x1="${x}" y1="${f1(gy-h*.45)}" x2="${f1(x+h*.1)}" y2="${gy}" stroke="#2d3a4a" stroke-width="${f1(h*.07)}"/><line x1="${x}" y1="${f1(gy-h*.78)}" x2="${x}" y2="${f1(gy-h*.42)}" stroke="${shirt}" stroke-width="${f1(h*.16)}"/><line x1="${f1(x-h*.16)}" y1="${f1(gy-h*.6)}" x2="${f1(x+h*.16)}" y2="${f1(gy-h*.68)}" stroke="${shirt}" stroke-width="${f1(h*.06)}"/><circle cx="${x}" cy="${f1(gy-h+r)}" r="${f1(r)}" fill="#f1c27d"/></g>`;},
+ walls:(x0,x1,top,gy,col='#f3e3c3')=>{const w=x1-x0,h=gy-top;let s=`<rect x="${f1(x0)}" y="${f1(top)}" width="${f1(w)}" height="${f1(h)}" fill="${col}" stroke="#8a6d4a" stroke-width="2"/>`;
+  const dw=Math.min(36,w*.16),dh=Math.min(64,h*.62);s+=`<rect x="${f1(x0+w/2-dw/2)}" y="${f1(gy-dh)}" width="${f1(dw)}" height="${f1(dh)}" fill="#8b5a2b"/><circle cx="${f1(x0+w/2+dw*.3)}" cy="${f1(gy-dh*.45)}" r="2.5" fill="#ffd34d"/>`;
+  const ww=Math.min(40,w*.17),wy=top+h*.22;[x0+w*.2-ww/2,x0+w*.8-ww/2].forEach(wx=>{s+=`<rect x="${f1(wx)}" y="${f1(wy)}" width="${f1(ww)}" height="${f1(ww*.8)}" fill="#bfe6fa" stroke="#fff" stroke-width="3"/><line x1="${f1(wx+ww/2)}" y1="${f1(wy)}" x2="${f1(wx+ww/2)}" y2="${f1(wy+ww*.8)}" stroke="#fff" stroke-width="2"/>`;});return s;},
+ water:(y,h,w=600)=>`<rect x="0" y="${y}" width="${w}" height="${h}" fill="#4aa3df" opacity=".75"/>`+Array.from({length:6},(_,i)=>`<path d="M${40+i*95} ${f1(y+h*.4+(i%2)*10)} q10 -5 20 0 t20 0" stroke="#fff" stroke-width="2" fill="none" opacity=".7"/>`).join(''),
+};
+/* overlay triangle drawn on top of a real object */
+function overlayTri(P,fill='rgba(255,255,255,.18)'){return`<polygon points="${P.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" fill="${fill}" stroke="#16302a" stroke-width="3" stroke-linejoin="round"/>`;}
+
+
+bindSound();
+const KEY='levelheaded.v4';
+const store=loadJ(KEY,{stars:{}});
+function save(){saveJ(KEY,store);}
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rr=(r,a,b)=>a+Math.floor(r()*(b-a+1));
+/* a pan is {a: bags, g: gumballs, n: balloons}; its weight is a·x + g − n */
+const pan=(a,g=0,n=0)=>({a,g,n});
+const net=(c)=>c>=0?pan(0,c,0):pan(0,0,-c);
+const swap=(p,r,o=.3)=>r()<o?{L:p.R,R:p.L,x:p.x}:p;
+const WORLDS=[
+ {name:'One Mystery Bag',blurb:'One bag plus some loose gumballs. Take gumballs off one pan, then match it on the other pan.',gen:r=>{const x=rr(r,1,12),b=rr(r,1,9);return swap({L:pan(1,b),R:pan(0,x+b),x},r);}},
+ {name:'Bundles of Bags',blurb:'Several identical bags. Split one pan into equal groups and keep one group. Then split the other pan the same way.',gen:r=>{const a=rr(r,2,6),x=rr(r,1,10);return swap({L:pan(a),R:pan(0,a*x),x},r);}},
+ {name:'Bags + Loose Gumballs',blurb:'Clear the loose gumballs first (from both pans), then split.',gen:r=>{const a=rr(r,2,5),x=rr(r,1,9),b=rr(r,1,12);return swap({L:pan(a,b),R:pan(0,a*x+b),x},r);}},
+ {name:'Helium Balloons',blurb:'Each balloon lifts 1 gumball\'s worth, so it counts as minus 1. Pop balloons (tap them) or use "Pair up" to cancel a gumball with a balloon.',
+  gen:r=>{const k=rr(r,0,2),x=rr(r,1,10);let p;
+   if(k===0){const n=rr(r,1,6);p={L:pan(1,0,n),R:net(x-n),x};}
+   else if(k===1){const g=rr(r,2,8),n=rr(r,1,g-1);p={L:pan(1,g,n),R:net(x+g-n),x};}
+   else{const a=rr(r,2,4),n=rr(r,1,8);p={L:pan(a,0,n),R:net(a*x-n),x};}return swap(p,r);}},
+ {name:'Bags on Both Pans',blurb:'Bags on both sides? Take the same number of bags off each pan first.',gen:r=>{const c=rr(r,1,3),a=c+rr(r,1,3),x=rr(r,1,8),b=rr(r,0,9);return swap({L:pan(a,b),R:pan(c,(a-c)*x+b),x},r,.5);}},
+ {name:'Head Candy Maker',blurb:'Every trick mixed together, balloons included.',gen:r=>{const k=rr(r,0,2),x=rr(r,1,9);
+   if(k===0){const a=rr(r,2,4),g=rr(r,2,9),n=rr(r,1,g);return swap({L:pan(a,g,n),R:net(a*x+g-n),x},r);}
+   if(k===1){const c=rr(r,1,2),a=c+rr(r,1,3),n=rr(r,1,6),d=(a-c)*x-n;return swap({L:pan(a,0,n),R:d>=0?pan(c,d):pan(c,0,-d),x},r,.5);}
+   return WORLDS[rr(r,1,4)].gen(r);}},
+];
+const LV=8;
+const NAMES=['Maya','Jordan','Ms. Ortiz','Dev','Coach Lee','Priya','Sam','Grandpa Joe','Aisha','Tomas'];
+function puzzleFor(w,l){return WORLDS[w].gen(rng(7177+w*131+l*17));}
+const W=p=>p.a*G.x+p.g-p.n;
+const balanced=s=>W(s.L)===W(s.R);
+const OT={L:'R',R:'L'},PN={L:'left',R:'right'};
+function solved(s){if(!balanced(s))return false;for(const k of['L','R']){const p=s[k],o=s[OT[k]];if(p.a===1&&p.g===0&&p.n===0&&o.a===0)return true;}return false;}
+function par(s){let best=99;for(const k of['L','R']){const P=s[k],O=s[OT[k]],d=P.a-O.a;if(d<=0)continue;
+  let m=(O.a>0?2:0);const pair=(P.g>0&&P.n>0)?1:0,c=P.g-P.n;m+=pair+(c!==0?2:0)+(d!==1?2:0);best=Math.min(best,m);}return best;}
+const cp=s=>({L:{...s.L},R:{...s.R}});
+const T={gum:['gumball','gumballs'],bag:['bag','bags'],bal:['balloon','balloons']};
+const thing=(k,n)=>n+' '+T[k][n===1?0:1];
+function desc(a){if(a.op==='/')return`split into ${a.n} groups and kept one`;if(a.op==='pair')return'paired up gumballs with balloons';return(a.op==='+'?'put on ':'took off ')+thing(a.k,a.n);}
+
+const G={w:0,l:0,s:null,start:null,x:0,hist:[],moves:0,par:0,hinted:false,pan:'L',op:'-',amt:'',kind:'gum',busy:false,done:false,angle:0,last:null};
+/* shop backdrop */
+$('#shop').innerHTML=`<rect width="640" height="340" fill="#fbe9d7"/><path d="M0 0h640v34H0z" fill="#e04866"/>`+Array.from({length:16},(_,i)=>`<path d="M${i*40} 34 q20 22 40 0" fill="${i%2?'#e04866':'#fff'}"/>`).join('')+
+ [70,570].map(x=>`<rect x="${x-50}" y="70" width="100" height="6" fill="#b07a4a"/><rect x="${x-50}" y="150" width="100" height="6" fill="#b07a4a"/>`+[[-30,'#e04866'],[0,'#3a92d8'],[30,'#2f9e5b']].map(([dx,c])=>`<rect x="${x+dx-12}" y="44" width="24" height="26" rx="5" fill="#fff" opacity=".8" stroke="#b07a4a"/><circle cx="${x+dx-4}" cy="60" r="5" fill="${c}"/><circle cx="${x+dx+5}" cy="62" r="5" fill="${c}"/><circle cx="${x+dx}" cy="53" r="5" fill="${c}"/>`).join('')+
+ [[-25,'#ffd34d'],[20,'#8a63d2']].map(([dx,c])=>`<rect x="${x+dx-16}" y="118" width="32" height="32" rx="6" fill="#fff" opacity=".8" stroke="#b07a4a"/><circle cx="${x+dx}" cy="136" r="9" fill="${c}"/>`).join('')).join('')+
+ `<rect x="0" y="318" width="640" height="22" fill="#b07a4a"/><rect x="0" y="318" width="640" height="4" fill="#8a5a32"/>`;
+
+/* scale drawing */
+const PX=320,PY=130,HALF=210;const GB=['#e04866','#3a92d8','#2f9e5b','#8a63d2','#f0b429'];
+const wrapIt=(kind,pn,svg)=>`<g class="it" data-kind="${kind}" data-pan="${pn}">${svg}</g>`;
+function bagItem(label,big){const w=big?52:28,h=big?36:32;return{w,h,k:'bag',svg:(x,y)=>`<path d="M${x+2} ${y+6} L${x+w-2} ${y+6} L${x+w} ${y+h} L${x} ${y+h}Z" fill="#c58a1a"/><path d="M${x+2} ${y+6} ${Array.from({length:Math.floor((w-4)/6)},()=>'l3 -5 l3 5').join(' ')}" fill="#c58a1a"/><text x="${x+w/2}" y="${y+h/2+11}" font-size="${big?14:label.length>2?11:15}" font-weight="700" text-anchor="middle" font-family="DM Mono,monospace" fill="#fff">${label}</text>`};}
+function gum(i){return{w:17,h:17,k:'gum',svg:(x,y)=>`<circle cx="${x+8.5}" cy="${y+8.5}" r="8" fill="${GB[i%5]}"/><circle cx="${x+6}" cy="${y+5.5}" r="2.4" fill="#fff" opacity=".55"/>`};}
+function jar(n){const w=n>10?50:36;return{w,h:30,k:'jar',svg:(x,y)=>`<rect x="${x}" y="${y+4}" width="${w}" height="26" rx="6" fill="#dff2fb" stroke="#33524a" stroke-width="1.5"/><rect x="${x+4}" y="${y}" width="${w-8}" height="6" rx="2" fill="#33524a"/><text x="${x+w/2}" y="${y+22}" font-size="13" font-weight="700" text-anchor="middle" font-family="DM Mono,monospace" fill="#16302a">${n}</text>`};}
+function panSVG(P,reveal,pn){
+ let s=`<line x1="0" y1="0" x2="-94" y2="104" stroke="#33524a" stroke-width="2"/><line x1="0" y1="0" x2="94" y2="104" stroke="#33524a" stroke-width="2"/>`;
+ const bl=[];if(P.n<=7)for(let i=0;i<P.n;i++)bl.push({r:11,t:'−1'});else bl.push({r:18,t:MINUS+P.n});
+ let tw=bl.reduce((t,o)=>t+o.r*2+3,0),bx=-tw/2;
+ bl.forEach((o,i)=>{const cx=bx+o.r,cy=-60+(i%2?6:0);bx+=o.r*2+3;
+  s+=`<path d="M${cx} ${cy+o.r} Q${cx*.5+4} ${cy+o.r+22} 0 -2" fill="none" stroke="#587168" stroke-width="1"/>`+wrapIt('bal',pn,`<ellipse cx="${cx}" cy="${cy}" rx="${o.r}" ry="${o.r*1.15}" fill="#3a92d8"/><ellipse cx="${cx-o.r*.35}" cy="${cy-o.r*.45}" rx="${o.r*.22}" ry="${o.r*.32}" fill="#fff" opacity=".45"/><text x="${cx}" y="${cy+4}" font-size="${o.r>12?12:8.5}" font-weight="700" text-anchor="middle" font-family="DM Mono,monospace" fill="#fff">${o.t}</text>`);});
+ s+=`<circle cx="0" cy="0" r="5" fill="none" stroke="#33524a" stroke-width="3"/>`;
+ const items=[],lab=reveal!=null?sgn(reveal):'?';
+ if(P.a>0){if(P.a<=6)for(let i=0;i<P.a;i++)items.push(bagItem(lab));else items.push(bagItem(P.a+' bags',true));}
+ if(P.g>0){let t=Math.floor(P.g/10),o=P.g%10;if(t>4){items.push(jar(t*10));t=0;}for(let i=0;i<t;i++)items.push(jar(10));for(let i=0;i<o;i++)items.push(gum(i));}
+ const rows=[[]];let rw=0;items.forEach(it=>{if(rw+it.w>176&&rows[rows.length-1].length){rows.push([]);rw=0;}rows[rows.length-1].push(it);rw+=it.w+3;});
+ let y=104;rows.forEach(row=>{if(!row.length)return;const h=Math.max(...row.map(i=>i.h)),w=row.reduce((t,i)=>t+i.w+3,-3);let x=-w/2;row.forEach(it=>{s+=wrapIt(it.k,pn,it.svg(x,y-it.h));x+=it.w+3;});y-=h+2;});
+ s+=`<path d="M-104 104 L104 104 Q94 120 0 120 Q-94 120 -104 104Z" fill="#33524a"/><text x="0" y="116" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="10" fill="#dfe9e4" letter-spacing="1">${pn==='L'?'LEFT':'RIGHT'}</text>`;return s;}
+function renderPans(reveal){const v=reveal?G.x:null;$('#panL').innerHTML=panSVG(G.s.L,v,'L');$('#panR').innerHTML=panSVG(G.s.R,v,'R');
+ $('#tipSign').innerHTML=balanced(G.s)?'':`<rect x="250" y="52" width="140" height="30" rx="15" fill="#cf3e35"/><text x="320" y="72" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="15" fill="#fff">NOT LEVEL!</text>`;}
+function setAngle(t){G.angle=t;const r=t*D2R,c=Math.cos(r),sn=Math.sin(r);$('#beam').setAttribute('transform',`rotate(${f1(t)} ${PX} ${PY})`);
+ $('#panL').setAttribute('transform',`translate(${f1(PX-HALF*c)} ${f1(PY-HALF*sn)})`);$('#panR').setAttribute('transform',`translate(${f1(PX+HALF*c)} ${f1(PY+HALF*sn)})`);}
+let twId=0;
+function tweenTo(target,ms=380){cancelAnimationFrame(twId);if(RM){setAngle(target);return;}const from=G.angle,t0=performance.now();
+ const step=now=>{const k=Math.min(1,(now-t0)/ms);const e=target===0?1-Math.pow(1-k,3)*Math.cos(k*7):1-Math.pow(1-k,3);setAngle(from+(target-from)*e);if(k<1)twId=requestAnimationFrame(step);};twId=requestAnimationFrame(step);}
+function tiltFor(s){const d=W(s.L)-W(s.R);if(!d)return 0;const m=Math.min(14,5+Math.abs(d)*1.2);return d>0?-m:m;}
+
+/* equation: balloons stay as their own minus term, e.g. x + 5 − 2 */
+function side(P){const p=[];if(P.a)p.push(`<span class="t-x">${P.a===1?'':P.a}x</span>`);
+ if(P.g)p.push((p.length?'<span class="rel">+</span>':'')+`<span class="t-n">${P.g}</span>`);
+ if(P.n)p.push(`<span class="rel">${MINUS}</span><span class="t-neg">${P.n}</span>`);
+ if(!p.length)p.push('<span class="t-n">0</span>');return`<span>${p.join(' ')}</span>`;}
+function renderEq(){const off=!balanced(G.s);$('#eq').innerHTML=side(G.s.L)+`<span class="rel${off?' off':''}">${off?'≠':'='}</span>`+side(G.s.R);}
+function msg(t,c=''){const m=$('#msg');m.textContent=t;m.className='msg '+c;}
+function renderBar(){$('#where').innerHTML=`<small>Shelf ${G.w+1} · ${WORLDS[G.w].name}</small>Order ${G.l+1}`;$('#movesPill').textContent=`Moves ${G.moves} · Best ${G.par}`;}
+function panWords(P){const p=[];if(P.a)p.push(`<b>${thing('bag',P.a)}</b>`);if(P.g)p.push(thing('gum',P.g));if(P.n)p.push(thing('bal',P.n));return p.join(' + ')||'nothing';}
+
+/* hints */
+function hint(s){
+ if(!balanced(s)){const d=W(s.L)-W(s.R);const lt=d>0?'R':'L',hv=OT[lt],k=Math.abs(d);
+  if(G.last&&G.last.op==='/')return{pan:OT[G.last.pan],op:'/',n:G.last.n,kind:'gum',why:`You split the ${PN[G.last.pan]} pan into ${G.last.n} groups. Split the ${PN[OT[G.last.pan]]} pan into ${G.last.n} groups too.`};
+  if(G.last&&G.last.k==='bag'){const o=OT[G.last.pan];return{pan:o,op:G.last.op,n:G.last.n,kind:'bag',why:`You ${desc(G.last)} on the ${PN[G.last.pan]} pan. Do the same on the ${PN[o]} pan.`};}
+  if(G.last&&G.last.pan===hv)return s[lt].n>=k&&G.last.k==='bal'&&G.last.op==='-'?{pan:lt,op:'-',n:k,kind:'bal',why:`The ${PN[lt]} pan is lighter now. Pop ${thing('bal',k)} there too.`}:{pan:lt,op:'+',n:k,kind:'gum',why:`The ${PN[hv]} pan got ${k} heavier. Make the ${PN[lt]} pan ${k} heavier too: put on ${thing('gum',k)}.`};
+  return s[hv].g>=k?{pan:hv,op:'-',n:k,kind:'gum',why:`The ${PN[lt]} pan lost ${k}. Take ${thing('gum',k)} off the ${PN[hv]} pan too.`}:{pan:hv,op:'+',n:k,kind:'bal',why:`The ${PN[lt]} pan lost ${k}. Tie ${thing('bal',k)} to the ${PN[hv]} pan too.`};}
+ if(s.L.a>0&&s.R.a>0){const k=s.L.a<=s.R.a?'L':'R';return{pan:k,op:'-',n:s[k].a,kind:'bag',why:`Bags are on both pans. Take ${thing('bag',s[k].a)} off the ${PN[k]} pan, then off the other pan.`};}
+ const k=s.L.a>0?'L':'R',P=s[k];
+ if(P.g>0&&P.n>0)return{pan:k,op:'pair',kind:'gum',why:`The ${PN[k]} pan has gumballs AND balloons. Pair them up: each gumball cancels a balloon, and the scale stays level.`};
+ if(P.g>0)return{pan:k,op:'-',n:P.g,kind:'gum',why:`Take the ${thing('gum',P.g)} off the ${PN[k]} pan, then make the other pan ${P.g} lighter too.`};
+ if(P.n>0)return{pan:k,op:'-',n:P.n,kind:'bal',why:`Pop the ${thing('bal',P.n)} on the ${PN[k]} pan, then make the other pan ${P.n} heavier too.`};
+ const O0=s[OT[k]];if(P.a>1&&O0.g>0&&O0.n>0)return{pan:OT[k],op:'pair',kind:'gum',why:`Before splitting, tidy the ${PN[OT[k]]} pan: pair up its gumballs and balloons so everything can be shared out evenly.`};
+ if(P.a>1)return{pan:k,op:'/',n:P.a,kind:'gum',why:`${P.a} bags are left. Split the ${PN[k]} pan into ${P.a} groups and keep one, then split the other pan the same way.`};
+ const O=s[OT[k]];if(O.g>0&&O.n>0)return{pan:OT[k],op:'pair',kind:'gum',why:'Pair up the gumballs and balloons on the other pan to see the answer.'};return null;}
+
+/* controls */
+const KEYS=['1','2','3','4','5','6','7','8','9','0','⌫'];
+$('#keys').innerHTML=KEYS.map(k=>`<button class="key${k==='⌫'?' wide':''}" data-k="${k}" aria-label="${k==='⌫'?'Delete':k}">${k}</button>`).join('')+
+ `<button class="key xk" data-kd="gum">gumball</button><button class="key xk" data-kd="bag">bag</button><button class="key xk" data-kd="bal">balloon</button>`;
+$('#keys').addEventListener('click',e=>{const b=e.target.closest('.key');if(!b)return;if(b.dataset.kd){G.kind=b.dataset.kd;sfx.tap();paintEntry();}else press(b.dataset.k);});
+document.querySelectorAll('.op').forEach(b=>b.onclick=()=>{G.op=b.dataset.op;sfx.tap();if(G.op==='pair')return act(G.pan,'pair',0,'gum');paintEntry();});
+document.querySelectorAll('.pan').forEach(b=>b.onclick=()=>{G.pan=b.dataset.pan;sfx.tap();paintEntry();});
+function press(k){if(G.busy||G.done)return;sfx.tap();if(k==='⌫')G.amt=G.amt.slice(0,-1);else if(G.amt.length<2)G.amt=(G.amt+k).replace(/^0+(?=\d)/,'');paintEntry();}
+function paintEntry(){if(G.op==='pair')G.op='-';
+ document.querySelectorAll('.op').forEach(b=>b.setAttribute('aria-pressed',b.dataset.op===G.op));
+ document.querySelectorAll('[data-kd]').forEach(b=>b.setAttribute('aria-pressed',G.op!=='/'&&b.dataset.kd===G.kind));
+ const d=W(G.s.L)-W(G.s.R);const need=d?(G.last?OT[G.last.pan]:null):null;
+ document.querySelectorAll('.pan').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.pan===G.pan);b.classList.toggle('needs',b.dataset.pan===need);});
+ const n=+G.amt;const sym={'+':'+','-':MINUS,'/':'÷'}[G.op];
+ $('#readout').innerHTML=G.amt?(G.op==='/'?`÷ ${n} <span class="ph">groups on the ${PN[G.pan]} pan, keep one</span>`:`${sym} ${thing(G.kind,n)} <span class="ph">${G.op==='+'?'put on':'taken off'} the ${PN[G.pan]} pan</span>`):
+  `${sym} ? <span class="ph">${G.op==='/'?'How many groups?':'Tap a number, then gumball, bag or balloon'}</span>`;
+ $('#applyBtn').textContent=`Do it to the ${PN[G.pan]} pan`;}
+function clearEntry(){G.amt='';paintEntry();}
+function fail(t){msg(t,'bad');sfx.bad();shakeEl($('#deck'));}
+
+function act(pn,op,n,kind){if(G.busy||G.done)return;const s=G.s,P={...s[pn]},O=s[OT[pn]];
+ const fld={gum:'g',bag:'a',bal:'n'}[kind];
+ if(op==='pair'){const m=Math.min(P.g,P.n);if(!m)return fail(`The ${PN[pn]} pan needs both gumballs and balloons to pair up.`);P.g-=m;P.n-=m;n=m;}
+ else{if(!n)return fail(op==='/'?'How many groups? Tap a number.':'Tap how many first.');
+  if(op==='/'){if(n===1)return fail('One group is the same as no split.');if(P.a%n||P.g%n||P.n%n)return fail(`The ${PN[pn]} pan can't be shared into ${n} equal groups. Every bag, gumball and balloon has to share out evenly (try pairing up first).`);P.a/=n;P.g/=n;P.n/=n;}
+  else if(op==='+')P[fld]+=n;
+  else{if(P[fld]<n)return fail(`There ${P[fld]===1?'is':'are'} only ${thing(kind,P[fld])} on the ${PN[pn]} pan.`);P[fld]-=n;}
+  if(P.a===0&&O.a===0)return fail("That would leave no bags on the scale, and we'd never find out what's inside!");}
+ G.hist.push({s:cp(s),last:G.last});G.moves++;G.busy=true;
+ const wasBal=balanced(s);G.s=cp(s);G.s[pn]=P;const nowBal=balanced(G.s);const a={pan:pn,op,n,k:kind};
+ renderPans();renderEq();tweenTo(tiltFor(G.s),nowBal?650:350);
+ if(op==='pair'){msg(`Paired up ${n} gumball${n>1?'s':''} with ${n} balloon${n>1?'s':''} on the ${PN[pn]} pan. They cancel, so the scale didn't move.`,'good');tone(660,.08,'sine',.06);}
+ else if(nowBal){tone(520,.08,'sine',.07);tone(780,.1,'sine',.06,.08);msg(wasBal?`Still level.`:`Level again! You matched it on the ${PN[pn]} pan.`,'good');G.last=null;}
+ else{tone(160,.15,'triangle',.12);if(wasBal)G.last=a;msg(wasBal?`The scale tipped! You ${desc(a)} on the ${PN[pn]} pan. Now make the same change to the ${PN[OT[pn]]} pan.`:`Still not level. Match your change on the other pan exactly, or undo.`,'bad');if(wasBal)G.pan=OT[pn];}
+ clearEntry();renderBar();setTimeout(()=>{G.busy=false;checkWin();},RM?50:300);}
+$('#applyBtn').onclick=()=>act(G.pan,G.op,+G.amt,G.kind);
+$('#pairBtn').onclick=()=>act(G.pan,'pair',0,'gum');
+$('#scaleSvg').addEventListener('click',e=>{const it=e.target.closest('.it');if(!it)return;const pn=it.dataset.pan,k=it.dataset.kind,P=G.s[pn];
+ if(k==='gum')act(pn,'-',1,'gum');else if(k==='jar')act(pn,'-',P.g>=50?Math.floor(P.g/10)*10:10,'gum');else if(k==='bag')act(pn,'-',P.a>6?P.a:1,'bag');else if(k==='bal')act(pn,'-',P.n>7?P.n:1,'bal');});
+$('#undoBtn').onclick=()=>{if(G.busy||G.done||!G.hist.length)return;const h=G.hist.pop();G.s=h.s;G.last=h.last;G.moves--;renderPans();renderEq();tweenTo(tiltFor(G.s));renderBar();paintEntry();msg('Undone.');};
+$('#resetBtn').onclick=()=>{if(G.busy||G.done)return;G.s=cp(G.start);G.hist=[];G.moves=0;G.last=null;renderPans();renderEq();tweenTo(0);renderBar();clearEntry();msg('Back to the start.');};
+$('#hintBtn').onclick=()=>{if(G.busy||G.done)return;const h=hint(G.s);if(!h)return;G.hinted=true;G.pan=h.pan;if(h.op==='pair'){G.op='-';paintEntry();msg(h.why+' Tap "Pair up".','good');return;}
+ G.op=h.op;G.amt=String(h.n);G.kind=h.kind;paintEntry();sfx.tap();msg(h.why+' (Filled in for you.)','good');};
+document.addEventListener('keydown',e=>{if(!$('#overlay').hidden){if(e.key==='Enter'){const p=$('#card .primary');if(p){e.preventDefault();p.click();}}return;}
+ if($('#play').hidden||e.metaKey||e.ctrlKey||e.altKey)return;const k=e.key;
+ if(/^[0-9]$/.test(k))press(k);else if(k==='Backspace')press('⌫');else if(k==='g')G.kind='gum';else if(k==='b'||k==='x')G.kind='bag';else if(k==='l')G.kind='bal';else if(k==='+'||k==='=')G.op='+';else if(k==='-')G.op='-';else if(k==='/')G.op='/';
+ else if(k==='ArrowLeft')G.pan='L';else if(k==='ArrowRight')G.pan='R';else if(k==='Enter')$('#applyBtn').click();else if(k==='z')$('#undoBtn').click();else return;paintEntry();e.preventDefault();});
+
+function startLevel(w,l){G.w=w;G.l=l;show('play');const p=puzzleFor(w,l);
+ G.s={L:{...p.L},R:{...p.R}};G.start=cp(G.s);G.x=p.x;G.hist=[];G.moves=0;G.par=par(G.s);G.hinted=false;G.done=false;G.busy=false;G.last=null;G.pan='L';G.op='-';G.kind='gum';clearEntry();renderPans();renderEq();setAngle(0);renderBar();
+ $('#story').innerHTML=`${NAMES[(w*8+l)%NAMES.length]}'s order: left pan has ${panWords(p.L)}, right pan has ${panWords(p.R)}. <b>How many gumballs are in each bag?</b>`;
+ msg(l===0?WORLDS[w].blurb:`Best possible: ${G.par} moves.`);}
+function checkWin(){if(!solved(G.s))return;G.done=true;renderPans(true);sfx.win();confetti($('#stage'));
+ let st=G.moves<=G.par?3:G.moves<=G.par+2?2:1;if(G.hinted)st=Math.min(st,2);const key=G.w+'-'+G.l,prev=store.stars[key]||0;if(st>prev){store.stars[key]=st;save();}
+ msg(`One bag is alone and balances ${G.x} gumball${G.x===1?'':'s'}.`,'good');
+ setTimeout(()=>{const last=G.l===LV-1,nw=last?G.w+1:G.w,nl=last?0:G.l+1,can=nw<WORLDS.length&&unlocked(nw,nl);
+  showCard(`<h2>${G.x} gumball${G.x===1?'':'s'} per bag!</h2><p>x = ${sgn(G.x)}</p><div style="font-size:40px;color:var(--gold);letter-spacing:6px">${'★'.repeat(st)}<span style="opacity:.25">${'★'.repeat(3-st)}</span></div>
+   <p>${G.moves} moves · best possible: ${G.par}${G.hinted?' · used a hint':''}</p>${st<3?'<p>Match the best for 3 stars.</p>':''}
+   <div class="row"><button class="btn" id="cR">Replay</button>${can?`<button class="btn primary" id="cN">${last?'Next shelf':'Next order'}</button>`:`<button class="btn primary" id="cM">All orders</button>`}</div>`);
+  $('#cR').onclick=()=>{hideCard();startLevel(G.w,G.l);};if(can)$('#cN').onclick=()=>{hideCard();startLevel(nw,nl);};else $('#cM').onclick=()=>{hideCard();show('menu');};},RM?150:800);}
+function cleared(w){let c=0;for(let l=0;l<LV;l++)if(store.stars[w+'-'+l])c++;return c;}
+function unlocked(w,l){if(w>0&&cleared(w-1)<5)return false;return l===0||!!store.stars[w+'-'+(l-1)];}
+function renderMenu(){$('#totStars').textContent=Object.values(store.stars).reduce((a,b)=>a+b,0);
+ $('#worlds').innerHTML=WORLDS.map((W,w)=>{const open=unlocked(w,0);let mark=false;
+  return`<div class="world${open?'':' locked'}"><div class="whead"><span class="num">SHELF ${w+1}</span><h3>${W.name}</h3></div><p class="blurb">${open?W.blurb:`Finish 5 orders on shelf ${w} to unlock.`}</p>
+  <div class="lvls">${Array.from({length:LV},(_,l)=>{const st=store.stars[w+'-'+l]||0,u=unlocked(w,l);let nx='';if(u&&!st&&!mark){nx=' next';mark=true;}
+   return`<button class="lvl${nx}" data-w="${w}" data-l="${l}" ${u?'':'disabled'} aria-label="Shelf ${w+1} order ${l+1}">${u?l+1:'🔒'}<small>${'★'.repeat(st)}</small></button>`;}).join('')}</div></div>`;}).join('');}
+$('#worlds').addEventListener('click',e=>{const b=e.target.closest('.lvl');if(b&&!b.disabled)startLevel(+b.dataset.w,+b.dataset.l);});
+$('#backBtn').onclick=()=>show('menu');
+function show(v){$('#menu').hidden=v!=='menu';$('#play').hidden=v!=='play';if(v==='menu')renderMenu();scrollTo(0,0);}
+renderMenu();setAngle(0);
+
+})();</script></body></html>
